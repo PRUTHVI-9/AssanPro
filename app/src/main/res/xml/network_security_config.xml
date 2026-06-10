@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">heartnetnetindiademo.in</domain>
+        <trust-anchors>
+            <certificates src="@raw/heartnetnetindiademo_in"/>
+            <certificates src="@raw/heartnetnetindiademo_in_chain"/>
+        </trust-anchors>
+    </domain-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">heartnetindia.in</domain>
+        <trust-anchors>
+            <certificates src="@raw/heartnetindia_in"/>
+            <certificates src="@raw/heartnetindia_in_chain"/>
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

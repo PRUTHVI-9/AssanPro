@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/patientHistoryLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:fitsSystemWindows="true"
+    android:focusableInTouchMode="true" >
+
+    <LinearLayout
+        android:id="@+id/linearLayoutMedical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/LinearLayoutHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+            <!--android:layout_alignParentTop="true" >-->
+
+            <TextView
+                android:id="@+id/textViewHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Patient History"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="@dimen/TAB_G_TextSizeLarge" />
+
+            <Button
+                android:id="@+id/buttonSaveMedical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="false"
+                android:layout_toLeftOf="@+id/imageViewCommStatus"
+                android:onClick="onClickPatientHistory"
+                android:text="SAVE"
+                android:textSize="@dimen/TAB_G_TextSizeLarge"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="BACK"
+                android:id="@+id/buttonBackMedical"
+                android:textStyle="bold"
+                android:textSize="@dimen/TAB_G_TextSizeLarge"
+                android:onClick="onClickPatientHistory" />
+
+            <ImageView
+                android:id="@+id/imageViewCommStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignBottom="@+id/buttonBackMedical"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="false"
+                android:layout_alignTop="@+id/buttonBackMedical"
+                android:src="@android:drawable/presence_online" />
+
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/scrollViewMedical" >
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView24"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Height (cm):"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextHeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="@string/numeric_keys"
+                        android:ems="10"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="number|numberDecimal"
+                        android:maxLength="5"
+                        android:numeric="decimal"
+                        android:singleLine="true"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <TextView
+                        android:id="@+id/textView25"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="Weight (Kg):"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextWeight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="numberDecimal"
+                        android:maxLength="5"
+                        android:numeric="decimal"
+                        android:singleLine="true"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <TextView
+                        android:id="@+id/textView43"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="BMI:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <TextView
+                        android:id="@+id/textViewBMI"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:lines="1"
+                        android:textStyle="bold"
+                        android:maxLength="5"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <TextView
+                        android:id="@+id/textViewSystolic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="Systolic:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextSystolic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="@string/numeric_keys"
+                        android:ems="10"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:numeric="integer"
+                        android:singleLine="true"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <TextView
+                        android:id="@+id/textViewDiastolic"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="Diastolic:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextDiastolic"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="@string/numeric_keys"
+                        android:ems="10"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:numeric="integer"
+                        android:singleLine="true"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <CheckBox
+                        android:id="@+id/checkBoxTropT"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:text="TropT" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textView51"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hb:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextHb"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="numberDecimal" />
+
+                    <TextView
+                        android:id="@+id/textView45"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="HbA1c:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextHbA1c"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="numberDecimal" />
+
+                    <TextView
+                        android:id="@+id/textView46"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="RBS:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextRBS"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView47"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="TC:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextTC"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView48"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="LDL:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextLDL"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView50"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="HDL:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextHDL"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="number" />
+
+                    <TextView
+                        android:id="@+id/textView49"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="TG:"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextTG"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:ems="10"
+                        android:inputType="number" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textViewHistoryNotes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minEms="5"
+                        android:text="History Notes:"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/editTextHistoryNotes"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="@string/alpha_numeric_hiphen_keys"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="text"
+                        android:maxLength="256"
+                        android:singleLine="true"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="5dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/textViewHistoryConditions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minEms="8"
+                        android:text="History Conditions : "
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <!--<MultiAutoCompleteTextView-->
+                        <!--android:id="@+id/multiAutoCompleteTextView"-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:digits="@string/history_condition_keys"-->
+                        <!--android:enabled="false"-->
+                        <!--android:imeOptions="actionDone"-->
+                        <!--android:inputType="text"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+                </LinearLayout>
+
+                <HorizontalScrollView
+                    android:id="@+id/scrollViewConditions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:fadeScrollbars="false"
+                    android:scrollbarFadeDuration="0">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Abdominal Pain"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition42"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Allergy"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Angina(chest Pain)"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Angioplasty"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Anxiety"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition6"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Aorta disease"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition7"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Arrythmia"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition8"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Atrial Fibrillation"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition9"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Blood test - CPK"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition10"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Bypass"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition11"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Cardiomyopathy"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition12"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Cholesterol"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition13"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Congenital Defects"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition14"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Cough"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition15"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Diabetes"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition44"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Drinking"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition16"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Fatigue"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition17"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Fullness of chest"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition18"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="General malaise"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition19"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Headache"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition20"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Heart Attack"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition21"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Heart Failure"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition22"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="High Blood Pressure"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition23"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Indigestion and heartburn"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition24"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Jaw pain"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition25"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Loss of appetite"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition26"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Marfan Syndrome"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition27"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Nausea"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition28"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Neck or shoulder pain"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition1"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="No History"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition29"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="No Symptoms"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition30"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Pain"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition31"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Pericarditis"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition32"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Peripheral Artery Disease(PAD)"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition33"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Shortness of breath"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition43"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Smoking"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition34"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Stroke"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition35"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Sweating - Arm pain"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition36"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Toothache"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition37"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Upper back pain"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition38"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Vascular disease"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition39"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Venous Thromboembolism"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="10dp"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition40"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Vomiting"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                            <CheckBox
+                                android:id="@+id/checkBoxCondition41"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClickPatientHistory"
+                                android:text="Weakness"
+                                android:textAppearance="@android:style/TextAppearance.Medium"
+                                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarPatientHistory"
+        android:visibility="invisible"
+        android:indeterminate="true"
+        android:layout_centerInParent="true" />
+
+</RelativeLayout>
