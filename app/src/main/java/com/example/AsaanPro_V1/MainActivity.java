@@ -1,5 +1,7 @@
 package com.example.AsaanPro_V1;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.ACCESS_NETWORK_STATE;
 import static android.Manifest.permission.ACCESS_WIFI_STATE;
 import static android.Manifest.permission.CHANGE_WIFI_STATE;
@@ -18,6 +20,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -34,6 +37,8 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -41,6 +46,7 @@ import android.opengl.GLSurfaceView;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CancellationSignal;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
@@ -51,10 +57,10 @@ import android.print.PrintDocumentAdapter;
 import android.print.PrintDocumentInfo;
 import android.print.PrintManager;
 import android.print.pdf.PrintedPdfDocument;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -87,24 +93,44 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
+import java.lang.reflect.Field;
+import java.net.HttpURLConnection;
+import java.net.SocketException;
+import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Blob;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -115,6 +141,7 @@ import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -140,15 +167,15 @@ import okhttp3.Response;
 //public class MainActivity extends Activity implements AdapterView.OnItemSelectedListener {
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-//    public String ASAAN_PRO_VERSION = "1.0";    //15-Jan-2024
+    //    public String ASAAN_PRO_VERSION = "1.0";    //15-Jan-2024
     public String ASAAN_PRO_VERSION = "1.0.0";    //14-Apr-2025
 
     public static final long NASAN_I2I_TOKEN_TIMEOUT_MSEC       = (15 * 60 * 1000);
 
     public static final String NASAN_I2I_URL_getonlinestatus    = "/ecgapi/ping";
-//    public static final String NASAN_I2I_URL_getdeviceinfo      = "/ecgapi/deviceinfo?amplifierID=";
+    //    public static final String NASAN_I2I_URL_getdeviceinfo      = "/ecgapi/deviceinfo?amplifierID=";
     public static final String NASAN_I2I_URL_getdeviceinfo = "/ecgapiAdvance/deviceinfo?amplifierID=";
-//    public static final String NASAN_I2I_URL_savedeviceinfo      = "/ecgapi/savedeviceinfo";
+    //    public static final String NASAN_I2I_URL_savedeviceinfo      = "/ecgapi/savedeviceinfo";
     public static final String NASAN_I2I_URL_savedeviceinfo = "/ecgapiadvance/devices";
     public static final String NASAN_I2I_URL_authenticate       = "/ecgapi/authenticate";
     public static final String NASAN_I2I_URL_getpatientlist     = "/ecgapi/getpatientlist";
@@ -158,9 +185,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String NASAN_I2I_URL_savepatienthistory = "/ecgapi/savepatienthistory";
     public static final String NASAN_I2I_URL_PutpatientReferralDoctor = "/ecgapiAdvance/scan/updateECGPatientTestsRecord";
     public static final String NASAN_I2I_URL_linkemergency      = "/ecgapi/linkemergency";
-//    public static final String NASAN_I2I_URL_downloadreport     = "/ecgapi/downloadreport";
+    //    public static final String NASAN_I2I_URL_downloadreport     = "/ecgapi/downloadreport";
     public static final String NASAN_I2I_URL_downloadreport = "/ecgapiAdvance/downloadreport";
-//    public static final String NASAN_I2I_URL_emailpdfreport     = "/ecgapi/emailpdfreport";
+    //    public static final String NASAN_I2I_URL_emailpdfreport     = "/ecgapi/emailpdfreport";
     public static final String NASAN_I2I_URL_uploadecg          = "/ecgapiAdvance/upload";
 
     public static final int ESY_G_DIALOG_STATE_NOT_FOREGROUND           = -1;
@@ -172,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final int ESY_G_DIALOG_STATE_PRINT_SUCCESS            = 5;
     public static final int ESY_G_DIALOG_STATE_PRINTER_TIMEOUT_ERROR    = 6;
     public static final int ESY_G_DIALOG_STATE_PRINT_GAIN_CHANGED       = 7;
-//    public static final int ESY_G_DIALOG_STATE_EMAIL_NETWORK_CHECK      = 8;
+    //    public static final int ESY_G_DIALOG_STATE_EMAIL_NETWORK_CHECK      = 8;
 //    public static final int ESY_G_DIALOG_STATE_PRINTA4_NETWORK_CHECK    = 9;
     public static final int ESY_G_DIALOG_STATE_DATA_VALIDATION          = 10;
     public static final int ESY_G_DIALOG_STATE_INVALID_DEVICE_ID        = 11;
@@ -262,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final byte COMMAND_GET_DEVICE_ID_BYTE         = (byte) 0x32;
     public static final byte COMMAND_SET_DEVICE_ID_BYTE         = (byte) 0x33;
 
-//    public static final short PRINT_FORMAT_A4            = 0;
+    //    public static final short PRINT_FORMAT_A4            = 0;
 //    public static final short PRINT_FORMAT_1CH           = 1;
     public static final short PRINT_FORMAT_3CH           = 2;
 
@@ -276,7 +303,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //    public static final byte HEADER_AXIS_HR_DATA    			= (byte) 0xD6;
 //    public static final byte HEADER_INTERPRETATION_DATA			= (byte) 0xD7;
 
-//    public static final byte PACKET_ACK                         = (byte) 0xAA;
+    //    public static final byte PACKET_ACK                         = (byte) 0xAA;
     public static final byte PRINTER_READY                      = (byte) 0x88;
     public static final byte PRINTER_ERROR                      = (byte) 0xE0;
 //    public static final byte PRINTER_NEW_PRINT_GAIN_5			= (byte) 0xE1;
@@ -309,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final float HOSPITAL_NAME_X 		= 1510;
 //    public static final float HOSPITAL_NAME_Y 		= 300;  //225;
 
-//    public static final String REPORT_NAME 		    = "Resting ECG Report";
+    //    public static final String REPORT_NAME 		    = "Resting ECG Report";
 //    public static final String REPORT_NAME2 		= "All Leads Measurement Report";
     public static final float REPORT_NAME_X 		= 1510;
 //    public static final float REPORT_NAME_Y 		= 375;
@@ -381,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String SPEED_MEDIUM = "25.0mm/sec";
     public static final String SPEED_HIGH = "50.0mm/sec";
 
-    public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.1";   // psy 01/06/2026 public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.0";     //15-Jan-2024
+    public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.0";     //15-Jan-2024
 
 //    public static final String DISCLAIMER 			= "*Unconfirmed Reporting, Unless Referred to Clinician.";
 //    public static final float DISCLAIMER_X 			= 150;
@@ -406,7 +433,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final int PRINTER_COMM_TIMEOUT_MSEC           = 60000;
     public static final int CHECK_USB_DETACH_TIMEOUT_MSEC       = 5000;
     public static final int SYNC_SERVER_CONNECTION_TIMEOUT_MSEC = 60000;
-//    public static final int SYNC_SERVER_TIMEOUT_MSEC            = 30000;
+    //    public static final int SYNC_SERVER_TIMEOUT_MSEC            = 30000;
     public static final int SYNC_SERVER_TIMEOUT_MSEC            = 10000;
 
     public static final float GAIN_ONE_FRACTION                 = (float) (1.0 / 5);
@@ -585,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static volatile short MinValECGLeadData0, MinValECGLeadData1, MinValECGLeadData2, MinValECGLeadData3, MinValECGLeadData4, MinValECGLeadData5;
     public static volatile short MinValECGLeadData6, MinValECGLeadData7, MinValECGLeadData8, MinValECGLeadData9, MinValECGLeadData10, MinValECGLeadData11;
 
-//    public static byte[] myBufferIn = new byte[64];
+    //    public static byte[] myBufferIn = new byte[64];
     public static final int BUFFERIN_LENGTH      = 8;
     public static final int BUFFERIN_FOLDBACK   = BUFFERIN_LENGTH - 1;
     public static byte[][] BufferIn = new byte[BUFFERIN_LENGTH][64];
@@ -666,7 +693,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static short PrintFormat;
     public int iPatientSampleIndex = 0;
 
-//    public ArrayList<String> PatientList = new ArrayList<String>();
+    //    public ArrayList<String> PatientList = new ArrayList<String>();
 //    public ArrayList<String> PatientSampleList = new ArrayList<String>();
 //    public ArrayList<Integer> PatientSampleStatus = new ArrayList<Integer>();
 //    public ArrayList<Boolean> PatientSampleReferred = new ArrayList<Boolean>();
@@ -725,7 +752,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //    public boolean StopServerSyncThread = false;
 
     public String strSearchPatientID, strSearchPatient_Fname, strSearchPatient_Mname, strSearchPatient_Lname, strSearchPatient_DOB, strSearchPatientAge, strSearchPatient_Mobile, strPatient_Mobile2;
-//    public SoapObject SaveHistoryResponse, GetPatientListResponse, GetPatientDetailsResponse, UpdatePatientResponse;
+    //    public SoapObject SaveHistoryResponse, GetPatientListResponse, GetPatientDetailsResponse, UpdatePatientResponse;
 //    public SoapObject GetPatientEventDetailsResponse;
     public JSONArray jsonGetPatientListResponse;
     public JSONObject jsonGetDeviceInfoResponse, jsonGetPatientDetailsResponse;
@@ -737,9 +764,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean SyncOfflineRegisteredEmergencyPatientResponseAwaited;
     public boolean SyncOfflineSavedHistoryResponseReceived;
     public boolean PatientEventDetailsResponseReceived, LinkEmergencyResponseReceived;//, CommentsReceived;
-//    public boolean WaitingForComments;
+    //    public boolean WaitingForComments;
     public boolean EmailPdfReportResponseReceived;
-//    public int CurrentPendingCommentsIndex;
+    //    public int CurrentPendingCommentsIndex;
     public int CurrentPendingRegisterPatientIndex;
 
     public boolean GetDeviceInfoResponseReceived, GetInstitutionLogoResponseReceived, DeviceInfoReceived, InstitutionLogoReceived, TokenReceived;
@@ -758,7 +785,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public Boolean HistoryECGDataFileDownloaded = false;
     public Boolean HistoryECGErrorFileDownloaded = false;
 
-//    public short NoOfEmergencies;
+    //    public short NoOfEmergencies;
 //    public ArrayList<String> EmergencySampleFname = new ArrayList<String>();
 //    public ArrayList<String> EmergencyDate = new ArrayList<String>();
 //    public ArrayList<String> EmergencyTime = new ArrayList<String>();
@@ -980,7 +1007,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public boolean EsyGOnline, GetOnlineStatusResponseReceived;
     public int iEsyGStatus;
-//    public int AttemptGetOnlineStatus;
+    //    public int AttemptGetOnlineStatus;
 //    public Timer CheckOnlineStatusTimer;
 //    public TimerTask CheckOnlineStatusTask;
     public int AttemptGetDeviceInfo, AttemptSaveDeviceInfo;
@@ -1005,12 +1032,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public clsEcgScan selectedScan;      //EcgScan object used for User-Selected scan
     boolean ConfirmSend;
 
-//bmp 02-Aug-23
+    //bmp 02-Aug-23
     private static final String[] INITIAL_PERMS = {
-        INTERNET,
-        ACCESS_NETWORK_STATE,
-        ACCESS_WIFI_STATE,
-        CHANGE_WIFI_STATE,
+            INTERNET,
+            ACCESS_NETWORK_STATE,
+            ACCESS_WIFI_STATE,
+            CHANGE_WIFI_STATE,
     };
     private static final int INITIAL_REQUEST = 1337;
 
@@ -1556,12 +1583,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         LongLead = "Lead II";
         QRSLead = "Lead II";
 //        strServerIP = "52.38.196.35:90";
-//        strServerIP = "heartnetnetindiademo.in";
+        strServerIP = "heartnetnetindiademo.in";
 //        strServerIP = "heartnetindia.in";
 //        strServerIP = "dev2.heartnetnetindiademo.in";
 //        strServerIP = "liveclone.heartnetindia.in";
 //bmp 05-Aug-25
-        strServerIP = "123.201.117.218:7104";
+//        strServerIP = "123.201.117.218:7104";
 //bmp 05-Aug-25
         PrintGainScale = 1;
         strPrinterEmailAddress = "";
@@ -2335,12 +2362,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 esygDbContract.CountryMaster.TABLE_NAME,  // The table to query
                 projection1,                               // The columns to return
                 null,                                // The columns for the WHERE clause
-        //    	    selectionArgs,                            // The values for the WHERE clause
+                //    	    selectionArgs,                            // The values for the WHERE clause
                 null,
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
                 null                                 // The sort order
-        //    	    null	                                 // The sort order
+                //    	    null	                                 // The sort order
         );
 
         CountryIDMaster.clear();
@@ -2604,7 +2631,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db.close();
     }
 
-//    public void ReadEmergencySampleList() {
+    //    public void ReadEmergencySampleList() {
 //        esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
 //        // Gets the data repository in write mode
 //        SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -2818,7 +2845,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //                        int iPatientSampleStatus = c1.getInt(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleStatus));
 //                        String strPatientSampleReferred = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleReferred));
 //                        String strPatientSampleComments = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleComments));
-////                        byte[] bytePatientSampleData = c1.getBlob(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleData));
+    ////                        byte[] bytePatientSampleData = c1.getBlob(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleData));
 //
 //                        PatientList.add(strPatientList);
 //                        PatientSampleList.add(strPatientSampleList);
@@ -2936,7 +2963,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 ////bmp 09-May-24
 ////        String whereClause = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientList + "=" + "'" + PatientList.get(iIndex) + "'";
 //        String whereClause = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + PatientSampleList.get(iIndex) + "'";
-////bmp 09-May-24
+    ////bmp 09-May-24
 //        long lTemp1 = db.update(esygDbContract.PatientSamplesDB.TABLE_NAME, values1, whereClause, null);
 //        if(lTemp1 <= 0) {
 //            lTemp1 = db.insert(esygDbContract.PatientSamplesDB.TABLE_NAME, null, values1);
@@ -2985,7 +3012,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db.close();
     }
 
-//    public void UpdatePendingSyncSampleList() {
+    //    public void UpdatePendingSyncSampleList() {
 //        while(!SyncServerThreadSleep) {
 //            try {
 //                Thread.sleep(100);
@@ -3870,27 +3897,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                         strComments[4] = OnlinePatient.strPatient_Lname;
                                         strComments[13] = OnlinePatient.strPatientID;
                                         strComments[23] = OnlinePatient.strPatient_Gender;
-                                        ////////////added by psy 01-06-26 for  history not seen on linked emergency report
-                                        strComments[6] =  OnlinePatient.Height ;
-                                        strComments[7] =  OnlinePatient.Weight ;
-                                        strComments[8] =  OnlinePatient.Systolic ;
-                                        strComments[9] =  OnlinePatient.Diastolic ;
-                                        if(OnlinePatient.strHistoryConditions == null)
-                                            OnlinePatient.strHistoryConditions = " ";
-                                        strComments[16] =  OnlinePatient.strHistoryConditions ;
-                                        if(OnlinePatient.HistoryText == null)
-                                            OnlinePatient.HistoryText = "";
-                                        strComments[20] =  OnlinePatient.HistoryText;
-                                        strComments[26]  = OnlinePatient.BMI ;
-                                        strComments[27]  = OnlinePatient.TropT;
-                                        strComments[28]  = OnlinePatient.Hb;
-                                        strComments[29]  = OnlinePatient.HbA1c;
-                                        strComments[30]  = OnlinePatient.RBS;
-                                        strComments[31]  = OnlinePatient.TC;
-                                        strComments[32]  = OnlinePatient.LDL;
-                                        strComments[33]  = OnlinePatient.HDL;
-                                        strComments[34] = OnlinePatient.TG;
-//////////////////////////////////////////////////////
 //bmp 03-Mar-25
                                         strComments[35] = OnlinePatient.strIDNumber;
 //bmp 03-Mar-25
@@ -3919,7 +3925,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                                 bt.setEnabled(true);
                         }
                     }
-                break;
+                    break;
                 case ESY_G_SERVER_SYNC_REGISTER_PATIENT:
                     pb = (ProgressBar) findViewById(R.id.progressBarPatientIdentity);
                     if(pb != null)
@@ -4612,7 +4618,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 ////bmp 09-May-24
 //            sVal = (short) (sVal & 0x00FF);
 //            iTemp = (int) (iTemp & 0x000000FF);
-////bmp 09-May-24
+    ////bmp 09-May-24
 //            sVal = (short) ((iTemp << 8) | sVal);
 //            switch (sTemp) {
 //                case 0:
@@ -4768,84 +4774,84 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //    if(rptPatient.TG.isEmpty())
 //        rptPatient.TG = "NA";
 //}
-public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
-    if(StrHWDeviceID.length() == 10) {
-        ecgScan.strScanDate = ecgScan.strScanFileName.substring(11, 21);
-        ecgScan.strScanTime = ecgScan.strScanFileName.substring(22, 30);
-    } else {
-        ecgScan.strScanDate = ecgScan.strScanFileName.substring(13, 23);
-        ecgScan.strScanTime = ecgScan.strScanFileName.substring(24, 32);
-    }
+    public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
+        if(StrHWDeviceID.length() == 10) {
+            ecgScan.strScanDate = ecgScan.strScanFileName.substring(11, 21);
+            ecgScan.strScanTime = ecgScan.strScanFileName.substring(22, 30);
+        } else {
+            ecgScan.strScanDate = ecgScan.strScanFileName.substring(13, 23);
+            ecgScan.strScanTime = ecgScan.strScanFileName.substring(24, 32);
+        }
 
-    byte[] bytearraydata = new byte[161 + (SIZEOF_RECORD_BUFFER * 2 * 12)];
-    String strScanComments = "";
+        byte[] bytearraydata = new byte[161 + (SIZEOF_RECORD_BUFFER * 2 * 12)];
+        String strScanComments = "";
 //bmp 25-Jul-25
 //bmp 13-Mar-25
-    if(Emergency) {
-        esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
-        // Gets the data repository in write mode
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String[] projection1 = {
-                esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleData,
-                esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleComments,
-        };
-        String selection1 = esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleList + "=" + "'" + ecgScan.strScanFileName + "'";
-        Cursor c1 = db.query(
-                esygDbContract.EmergencySamplesDB.TABLE_NAME,  // The table to query
-                projection1,                               // The columns to return
-                selection1,                                // The columns for the WHERE clause
-                //    	    selectionArgs,                            // The values for the WHERE clause
-                null,
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-        if (c1 != null && c1.moveToFirst()) {
-            if (c1.getCount() > 0) {
-                try {
-                    bytearraydata = c1.getBlob(c1.getColumnIndexOrThrow(esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleData));
-                    strScanComments = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleComments));
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if(Emergency) {
+            esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
+            // Gets the data repository in write mode
+            SQLiteDatabase db = mDbHelper.getReadableDatabase();
+            String[] projection1 = {
+                    esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleData,
+                    esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleComments,
+            };
+            String selection1 = esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleList + "=" + "'" + ecgScan.strScanFileName + "'";
+            Cursor c1 = db.query(
+                    esygDbContract.EmergencySamplesDB.TABLE_NAME,  // The table to query
+                    projection1,                               // The columns to return
+                    selection1,                                // The columns for the WHERE clause
+                    //    	    selectionArgs,                            // The values for the WHERE clause
+                    null,
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    null                                 // The sort order
+            );
+            if (c1 != null && c1.moveToFirst()) {
+                if (c1.getCount() > 0) {
+                    try {
+                        bytearraydata = c1.getBlob(c1.getColumnIndexOrThrow(esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleData));
+                        strScanComments = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.EmergencySamplesDB.COLUMN_NAME_EmergencySampleComments));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        db.close();
-    } else {
+            db.close();
+        } else {
 //bmp 13-Mar-25
 //bmp 25-Jul-25
-        esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
-        // Gets the data repository in write mode
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String[] projection1 = {
-                esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleData,
-                esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleComments,
-        };
-        String selection1 = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + ecgScan.strScanFileName + "'";
-        Cursor c1 = db.query(
-                esygDbContract.PatientSamplesDB.TABLE_NAME,  // The table to query
-                projection1,                               // The columns to return
-                selection1,                                // The columns for the WHERE clause
-                //    	    selectionArgs,                            // The values for the WHERE clause
-                null,
-                null,                                     // don't group the rows
-                null,                                     // don't filter by row groups
-                null                                 // The sort order
-        );
-        if (c1 != null && c1.moveToFirst()) {
-            if (c1.getCount() > 0) {
-                try {
-                    bytearraydata = c1.getBlob(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleData));
-                    strScanComments = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleComments));
-                } catch (Exception e) {
-                    e.printStackTrace();
+            esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
+            // Gets the data repository in write mode
+            SQLiteDatabase db = mDbHelper.getReadableDatabase();
+            String[] projection1 = {
+                    esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleData,
+                    esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleComments,
+            };
+            String selection1 = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + ecgScan.strScanFileName + "'";
+            Cursor c1 = db.query(
+                    esygDbContract.PatientSamplesDB.TABLE_NAME,  // The table to query
+                    projection1,                               // The columns to return
+                    selection1,                                // The columns for the WHERE clause
+                    //    	    selectionArgs,                            // The values for the WHERE clause
+                    null,
+                    null,                                     // don't group the rows
+                    null,                                     // don't filter by row groups
+                    null                                 // The sort order
+            );
+            if (c1 != null && c1.moveToFirst()) {
+                if (c1.getCount() > 0) {
+                    try {
+                        bytearraydata = c1.getBlob(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleData));
+                        strScanComments = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleComments));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-        }
-        db.close();
+            db.close();
 //bmp 25-Jul-25
 //bmp 13-Mar-25
-    }
+        }
 //bmp 13-Mar-25
 //bmp 25-Jul-25
 ////bmp 21-Jan-25
@@ -4864,237 +4870,237 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //        }
 ////bmp 21-Jan-25
 
-    int bytearrayIndex = 0;
-    int NoOfBytes, iTemp;
-    short sVal, sTemp;
+        int bytearrayIndex = 0;
+        int NoOfBytes, iTemp;
+        short sVal, sTemp;
 
-    NoOfBytes = bytearraydata[bytearrayIndex++];
-    iTemp = bytearraydata[bytearrayIndex++];
-    NoOfBytes = (iTemp << 8) | NoOfBytes;
-    iTemp = bytearraydata[bytearrayIndex++];
-    NoOfBytes = (iTemp << 16) | NoOfBytes;
-    iTemp = bytearraydata[bytearrayIndex++];
-    NoOfBytes = (iTemp << 24) | NoOfBytes;
+        NoOfBytes = bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
+        NoOfBytes = (iTemp << 8) | NoOfBytes;
+        iTemp = bytearraydata[bytearrayIndex++];
+        NoOfBytes = (iTemp << 16) | NoOfBytes;
+        iTemp = bytearraydata[bytearrayIndex++];
+        NoOfBytes = (iTemp << 24) | NoOfBytes;
 
-    int iTempID;
-    iTempID = bytearraydata[bytearrayIndex++];
-    iTemp = bytearraydata[bytearrayIndex++];
-    iTempID = (iTemp << 8) | iTempID;
-    iTemp = bytearraydata[bytearrayIndex++];
-    iTempID = (iTemp << 16) | iTempID;
-    iTemp = bytearraydata[bytearrayIndex++];
-    iTempID = (iTemp << 24) | iTempID;
+        int iTempID;
+        iTempID = bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
+        iTempID = (iTemp << 8) | iTempID;
+        iTemp = bytearraydata[bytearrayIndex++];
+        iTempID = (iTemp << 16) | iTempID;
+        iTemp = bytearraydata[bytearrayIndex++];
+        iTempID = (iTemp << 24) | iTempID;
 //                ReportPatient.strPatientID = String.valueOf(iTempID);
-    rptPatient.strPatientID = String.valueOf(iTempID);
+        rptPatient.strPatientID = String.valueOf(iTempID);
 
-    iTemp = bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
 //                if (iTemp == 1)
 //                    AllLeadMeasurementReport = true;
 //                else
 //                    AllLeadMeasurementReport = false;
 
-    iTemp = bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
 //                if (iTemp == 1)
 //                    RestingECGReport = true;
 //                else
 //                    RestingECGReport = false;
 
-    LongLead = "Lead " + LEADS[bytearraydata[bytearrayIndex++]];
+        LongLead = "Lead " + LEADS[bytearraydata[bytearrayIndex++]];
 //                QRSLead = "Lead " + LEADS[inRawData.read()];
-    QRSLeadIndex = (short)bytearraydata[bytearrayIndex++];
-    QRSLead = "Lead " + LEADS[QRSLeadIndex];
+        QRSLeadIndex = (short)bytearraydata[bytearrayIndex++];
+        QRSLead = "Lead " + LEADS[QRSLeadIndex];
 
 //                ESY_G_VERSION = String.valueOf(inRawData.read()) + ".";
 //                ESY_G_VERSION = ESY_G_VERSION + String.valueOf(inRawData.read());
-    iTemp = bytearraydata[bytearrayIndex++];
-    iTemp = bytearraydata[bytearrayIndex++];
-
-    HWMainVersion = (byte) bytearraydata[bytearrayIndex++];
-    HWSubVersion = (byte) bytearraydata[bytearrayIndex++];
-
-    iTemp = bytearraydata[bytearrayIndex++];
-    if (iTemp == 1)
-        ecgScan.DemoMode = true;
-    else
-        ecgScan.DemoMode = false;
-
-    iTemp = bytearraydata[bytearrayIndex++];
-    iTemp = bytearraydata[bytearrayIndex++];
-    if (iTemp == 1)
-        ecgScan.Emergency = true;
-    else
-        ecgScan.Emergency = false;
-
-    iTemp = bytearraydata[bytearrayIndex++];
-    iTemp = bytearraydata[bytearrayIndex++];
-
-    TechnicianName = "";
-    for (int i = 0; i < 35; i++) {
-        TechnicianName = TechnicianName + (char) bytearraydata[bytearrayIndex++];
-    }
-
-    InstrumentName = "";
-    for (int i = 0; i < 35; i++) {
-        InstrumentName = InstrumentName + (char) bytearraydata[bytearrayIndex++];
-    }
-
-    for (int i = 0; i < 18; i++) {
-        ecgScan.nInterpretation_Status[i] = (short) bytearraydata[bytearrayIndex++];
-    }
-
-    String strTemp = "";
-    switch(ecgScan.nInterpretation_Status[0]) {
-        case 0:
-            strTemp = strTemp.concat("Sinus Rhythm. ");
-            break;
-        case 1:
-            strTemp = strTemp.concat("Sinus Bradycardia. ");
-            break;
-        case 2:
-            strTemp = strTemp.concat("Sinus tachycardia. ");
-            break;
-        case 3:
-            strTemp = strTemp.concat("Junctional/NonSinus Rhythm suspected. ");
-            break;
-    }
-    switch(ecgScan.nInterpretation_Status[1]) {
-        case 0:
-            strTemp = strTemp.concat("PR is short. ");
-            break;
-        case 1:
-            strTemp = strTemp.concat("PR is long. ");
-            break;
-        case 2:
-            strTemp = strTemp.concat("PR is normal. ");
-            break;
-    }
-    switch(ecgScan.nInterpretation_Status[2]) {
-        case 0:
-            strTemp = strTemp.concat("Wide QRS. ");
-            break;
-        case 1:
-            strTemp = strTemp.concat("Normal QRS Width. ");
-            break;
-    }
-    switch(ecgScan.nInterpretation_Status[3]) {
-        case 0:
-            strTemp = strTemp.concat("QT Interval is prolonged. ");
-            break;
-        case 1:
-            strTemp = strTemp.concat("Normal QT interval. ");
-            break;
-    }
-    switch(ecgScan.nInterpretation_Status[4]) {
-        case 0:
-            strTemp = strTemp.concat("Right axis deviation. ");
-            break;
-        case 1:
-            strTemp = strTemp.concat("Left axis deviation. ");
-            break;
-        case 2:
-            strTemp = strTemp.concat("QRS Axis is indeterminate. ");
-            break;
-        case 3:
-            strTemp = strTemp.concat("QRS Axis is normal. ");
-            break;
-    }
-    String strTWaveStatement = "";
-    if(ecgScan.nInterpretation_Status[5] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("I");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", I");
-    }
-    if(ecgScan.nInterpretation_Status[6] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("II");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", II");
-    }
-    if(ecgScan.nInterpretation_Status[8] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("aVR");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", aVR");
-    }
-    if(ecgScan.nInterpretation_Status[13] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("V3");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", V3");
-    }
-    if(ecgScan.nInterpretation_Status[14] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("V4");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", V4");
-    }
-    if(ecgScan.nInterpretation_Status[15] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("V5");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", V5");
-    }
-    if(ecgScan.nInterpretation_Status[16] == 1) {
-        if(strTWaveStatement.length() == 0)
-            strTWaveStatement = strTWaveStatement.concat("V6");
-        else
-            strTWaveStatement = strTWaveStatement.concat(", V6");
-    }
-    if(!strTWaveStatement.equalsIgnoreCase("")) {
-        strTemp = strTemp.concat("T wave inversion in leads ");
-        strTemp = strTemp.concat(strTWaveStatement);
-        strTemp = strTemp.concat(".");
-    }
-
-    strAutoInterpretation = strTemp;
-
-    //Read additional 52 bytes as per file format dated 18/04/2017
-    for (int i = 0; i < 50; i++) {
         iTemp = bytearraydata[bytearrayIndex++];
-    }
+        iTemp = bytearraydata[bytearrayIndex++];
 
-    int iTemp1 = bytearraydata[bytearrayIndex++];  //lsb
-    int iTemp2 = bytearraydata[bytearrayIndex++];  //msb
-//bmp 09-May-24
-    iTemp1 = (int) (iTemp1 & 0x000000FF);
-    iTemp2 = (int) (iTemp2 & 0x000000FF);
-//bmp 09-May-24
-    iTemp2 = iTemp2 << 8;
-    iTemp1 = iTemp2 | iTemp1;
-    short sRRInterval = (short) iTemp1;
-    Measurement.RR_Interval = (short)(sRRInterval >> 2);
+        HWMainVersion = (byte) bytearraydata[bytearrayIndex++];
+        HWSubVersion = (byte) bytearraydata[bytearrayIndex++];
 
-    for (short k = 0; k < 12; k++) {
-        sTemp = k;//vnp 2 july 16  LEAD_INDEX[k];
-        for (int j = 0; j < SIZEOF_RECORD_BUFFER; j++) {
-            sVal = (short) bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
+        if (iTemp == 1)
+            ecgScan.DemoMode = true;
+        else
+            ecgScan.DemoMode = false;
+
+        iTemp = bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
+        if (iTemp == 1)
+            ecgScan.Emergency = true;
+        else
+            ecgScan.Emergency = false;
+
+        iTemp = bytearraydata[bytearrayIndex++];
+        iTemp = bytearraydata[bytearrayIndex++];
+
+        TechnicianName = "";
+        for (int i = 0; i < 35; i++) {
+            TechnicianName = TechnicianName + (char) bytearraydata[bytearrayIndex++];
+        }
+
+        InstrumentName = "";
+        for (int i = 0; i < 35; i++) {
+            InstrumentName = InstrumentName + (char) bytearraydata[bytearrayIndex++];
+        }
+
+        for (int i = 0; i < 18; i++) {
+            ecgScan.nInterpretation_Status[i] = (short) bytearraydata[bytearrayIndex++];
+        }
+
+        String strTemp = "";
+        switch(ecgScan.nInterpretation_Status[0]) {
+            case 0:
+                strTemp = strTemp.concat("Sinus Rhythm. ");
+                break;
+            case 1:
+                strTemp = strTemp.concat("Sinus Bradycardia. ");
+                break;
+            case 2:
+                strTemp = strTemp.concat("Sinus tachycardia. ");
+                break;
+            case 3:
+                strTemp = strTemp.concat("Junctional/NonSinus Rhythm suspected. ");
+                break;
+        }
+        switch(ecgScan.nInterpretation_Status[1]) {
+            case 0:
+                strTemp = strTemp.concat("PR is short. ");
+                break;
+            case 1:
+                strTemp = strTemp.concat("PR is long. ");
+                break;
+            case 2:
+                strTemp = strTemp.concat("PR is normal. ");
+                break;
+        }
+        switch(ecgScan.nInterpretation_Status[2]) {
+            case 0:
+                strTemp = strTemp.concat("Wide QRS. ");
+                break;
+            case 1:
+                strTemp = strTemp.concat("Normal QRS Width. ");
+                break;
+        }
+        switch(ecgScan.nInterpretation_Status[3]) {
+            case 0:
+                strTemp = strTemp.concat("QT Interval is prolonged. ");
+                break;
+            case 1:
+                strTemp = strTemp.concat("Normal QT interval. ");
+                break;
+        }
+        switch(ecgScan.nInterpretation_Status[4]) {
+            case 0:
+                strTemp = strTemp.concat("Right axis deviation. ");
+                break;
+            case 1:
+                strTemp = strTemp.concat("Left axis deviation. ");
+                break;
+            case 2:
+                strTemp = strTemp.concat("QRS Axis is indeterminate. ");
+                break;
+            case 3:
+                strTemp = strTemp.concat("QRS Axis is normal. ");
+                break;
+        }
+        String strTWaveStatement = "";
+        if(ecgScan.nInterpretation_Status[5] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("I");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", I");
+        }
+        if(ecgScan.nInterpretation_Status[6] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("II");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", II");
+        }
+        if(ecgScan.nInterpretation_Status[8] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("aVR");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", aVR");
+        }
+        if(ecgScan.nInterpretation_Status[13] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("V3");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", V3");
+        }
+        if(ecgScan.nInterpretation_Status[14] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("V4");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", V4");
+        }
+        if(ecgScan.nInterpretation_Status[15] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("V5");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", V5");
+        }
+        if(ecgScan.nInterpretation_Status[16] == 1) {
+            if(strTWaveStatement.length() == 0)
+                strTWaveStatement = strTWaveStatement.concat("V6");
+            else
+                strTWaveStatement = strTWaveStatement.concat(", V6");
+        }
+        if(!strTWaveStatement.equalsIgnoreCase("")) {
+            strTemp = strTemp.concat("T wave inversion in leads ");
+            strTemp = strTemp.concat(strTWaveStatement);
+            strTemp = strTemp.concat(".");
+        }
+
+        strAutoInterpretation = strTemp;
+
+        //Read additional 52 bytes as per file format dated 18/04/2017
+        for (int i = 0; i < 50; i++) {
             iTemp = bytearraydata[bytearrayIndex++];
+        }
+
+        int iTemp1 = bytearraydata[bytearrayIndex++];  //lsb
+        int iTemp2 = bytearraydata[bytearrayIndex++];  //msb
 //bmp 09-May-24
-            sVal = (short) (sVal & 0x00FF);
-            iTemp = (int) (iTemp & 0x000000FF);
+        iTemp1 = (int) (iTemp1 & 0x000000FF);
+        iTemp2 = (int) (iTemp2 & 0x000000FF);
 //bmp 09-May-24
-            sVal = (short) ((iTemp << 8) | sVal);
-            switch (sTemp) {
-                case 0:
-                    ecgScan.ECGLeadData0[j] = sVal;
-                    break;
-                case 1:
-                    ecgScan.ECGLeadData1[j] = sVal;
-                    break;
-                case 2:
-                    ecgScan.ECGLeadData2[j] = sVal;
-                    break;
-                case 3:
-                    ecgScan.ECGLeadData3[j] = sVal;
-                    break;
-                case 4:
-                    ecgScan.ECGLeadData4[j] = sVal;
-                    break;
-                case 5:
-                    ecgScan.ECGLeadData5[j] = sVal;
-                    break;
-                case 6:
+        iTemp2 = iTemp2 << 8;
+        iTemp1 = iTemp2 | iTemp1;
+        short sRRInterval = (short) iTemp1;
+        Measurement.RR_Interval = (short)(sRRInterval >> 2);
+
+        for (short k = 0; k < 12; k++) {
+            sTemp = k;//vnp 2 july 16  LEAD_INDEX[k];
+            for (int j = 0; j < SIZEOF_RECORD_BUFFER; j++) {
+                sVal = (short) bytearraydata[bytearrayIndex++];
+                iTemp = bytearraydata[bytearrayIndex++];
+//bmp 09-May-24
+                sVal = (short) (sVal & 0x00FF);
+                iTemp = (int) (iTemp & 0x000000FF);
+//bmp 09-May-24
+                sVal = (short) ((iTemp << 8) | sVal);
+                switch (sTemp) {
+                    case 0:
+                        ecgScan.ECGLeadData0[j] = sVal;
+                        break;
+                    case 1:
+                        ecgScan.ECGLeadData1[j] = sVal;
+                        break;
+                    case 2:
+                        ecgScan.ECGLeadData2[j] = sVal;
+                        break;
+                    case 3:
+                        ecgScan.ECGLeadData3[j] = sVal;
+                        break;
+                    case 4:
+                        ecgScan.ECGLeadData4[j] = sVal;
+                        break;
+                    case 5:
+                        ecgScan.ECGLeadData5[j] = sVal;
+                        break;
+                    case 6:
 //bmp 13-May-25
 ////bmp 02-May-25
 //                    sVal = (short) (sVal & 0x0FFF);
@@ -5102,9 +5108,9 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        sVal = (short) (sVal - 0x1000);
 ////bmp 02-May-25
 //bmp 13-May-25
-                    ecgScan.ECGLeadData6[j] = sVal;
-                    break;
-                case 7:
+                        ecgScan.ECGLeadData6[j] = sVal;
+                        break;
+                    case 7:
 //bmp 13-May-25
 ////bmp 02-May-25
 //                    sVal = (short) (sVal & 0x0FFF);
@@ -5112,9 +5118,9 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        sVal = (short) (sVal - 0x1000);
 ////bmp 02-May-25
 //bmp 13-May-25
-                    ecgScan.ECGLeadData7[j] = sVal;
-                    break;
-                case 8:
+                        ecgScan.ECGLeadData7[j] = sVal;
+                        break;
+                    case 8:
 //bmp 13-May-25
 ////bmp 02-May-25
 //                    sVal = (short) (sVal & 0x0FFF);
@@ -5122,9 +5128,9 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        sVal = (short) (sVal - 0x1000);
 ////bmp 02-May-25
 //bmp 13-May-25
-                    ecgScan.ECGLeadData8[j] = sVal;
-                    break;
-                case 9:
+                        ecgScan.ECGLeadData8[j] = sVal;
+                        break;
+                    case 9:
 //bmp 13-May-25
 ////bmp 02-May-25
 //                    sVal = (short) (sVal & 0x0FFF);
@@ -5132,9 +5138,9 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        sVal = (short) (sVal - 0x1000);
 ////bmp 02-May-25
 //bmp 13-May-25
-                    ecgScan.ECGLeadData9[j] = sVal;
-                    break;
-                case 10:
+                        ecgScan.ECGLeadData9[j] = sVal;
+                        break;
+                    case 10:
 //bmp 13-May-25
 ////bmp 02-May-25
 //                    sVal = (short) (sVal & 0x0FFF);
@@ -5142,9 +5148,9 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        sVal = (short) (sVal - 0x1000);
 ////bmp 02-May-25
 //bmp 13-May-25
-                    ecgScan.ECGLeadData10[j] = sVal;
-                    break;
-                case 11:
+                        ecgScan.ECGLeadData10[j] = sVal;
+                        break;
+                    case 11:
 //bmp 13-May-25
 ////bmp 02-May-25
 //                    sVal = (short) (sVal & 0x0FFF);
@@ -5152,144 +5158,144 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        sVal = (short) (sVal - 0x1000);
 ////bmp 02-May-25
 //bmp 13-May-25
-                    ecgScan.ECGLeadData11[j] = sVal;
-                    break;
+                        ecgScan.ECGLeadData11[j] = sVal;
+                        break;
+                }
             }
         }
-    }
 
 //        String[] strSplit = alECGScan.get(iPatientSampleIndex).strComments.split("\n");
-    String[] strSplit = strScanComments.split("\n");
+        String[] strSplit = strScanComments.split("\n");
 //bmp 03-Mar-25
 //        String[] strComments = new String[35];
-    String[] strComments = new String[36];
+        String[] strComments = new String[36];
 //bmp 03-Mar-25
-    int j;
-    for(j=0; j<strSplit.length; j++) {
-        strComments[j] = strSplit[j];
-    }
+        int j;
+        for(j=0; j<strSplit.length; j++) {
+            strComments[j] = strSplit[j];
+        }
 //bmp 03-Mar-25
 //        for(; j<35; j++) {
-    for(; j<36; j++) {
+        for(; j<36; j++) {
 //bmp 03-Mar-25
-        strComments[j] = "";
-    }
-    int iCommentsIndex = 0;
-    rptPatient.strPatient_Mobile = strComments[iCommentsIndex++].trim();
-    try {
-        long lTemp = Long.parseLong(rptPatient.strPatient_Mobile);  //bmp added on 12/12/2016
-    }catch (NumberFormatException e) {
-        rptPatient.strPatient_Mobile = "";
-    }
+            strComments[j] = "";
+        }
+        int iCommentsIndex = 0;
+        rptPatient.strPatient_Mobile = strComments[iCommentsIndex++].trim();
+        try {
+            long lTemp = Long.parseLong(rptPatient.strPatient_Mobile);  //bmp added on 12/12/2016
+        }catch (NumberFormatException e) {
+            rptPatient.strPatient_Mobile = "";
+        }
 
-    rptPatient.strPatient_DOB = strComments[iCommentsIndex++].trim();
-    Calendar calSet = Calendar.getInstance();
-    int year = Integer.parseInt(rptPatient.strPatient_DOB.substring(6, 10));
-    int monthOfYear = Integer.parseInt(rptPatient.strPatient_DOB.substring(3, 5)) - 1;
-    int dayOfMonth = Integer.parseInt(rptPatient.strPatient_DOB.substring(0, 2));
-    calSet.set(Calendar.YEAR, year);
-    calSet.set(Calendar.MONTH, monthOfYear);
-    calSet.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        rptPatient.strPatient_DOB = strComments[iCommentsIndex++].trim();
+        Calendar calSet = Calendar.getInstance();
+        int year = Integer.parseInt(rptPatient.strPatient_DOB.substring(6, 10));
+        int monthOfYear = Integer.parseInt(rptPatient.strPatient_DOB.substring(3, 5)) - 1;
+        int dayOfMonth = Integer.parseInt(rptPatient.strPatient_DOB.substring(0, 2));
+        calSet.set(Calendar.YEAR, year);
+        calSet.set(Calendar.MONTH, monthOfYear);
+        calSet.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-    Calendar calNow = Calendar.getInstance();
-    int iYear = calNow.get(Calendar.YEAR);
-    int iAge = iYear - year;
-    if (calNow.get(Calendar.DAY_OF_YEAR) < calSet.get(Calendar.DAY_OF_YEAR)) {
-        iAge--;
-    }
-    rptPatient.PatientAge = "--";
+        Calendar calNow = Calendar.getInstance();
+        int iYear = calNow.get(Calendar.YEAR);
+        int iAge = iYear - year;
+        if (calNow.get(Calendar.DAY_OF_YEAR) < calSet.get(Calendar.DAY_OF_YEAR)) {
+            iAge--;
+        }
+        rptPatient.PatientAge = String.valueOf(iAge);
 
-    rptPatient.strPatient_Fname = strComments[iCommentsIndex++].trim();
-    rptPatient.strPatient_Mname = strComments[iCommentsIndex++].trim();
-    rptPatient.strPatient_Lname = strComments[iCommentsIndex++].trim();
-    SelectedEventID = Integer.parseInt(strComments[iCommentsIndex++].trim());
-    rptPatient.Height = strComments[iCommentsIndex++].trim();
-    rptPatient.Weight = strComments[iCommentsIndex++].trim();
-    rptPatient.Systolic = strComments[iCommentsIndex++].trim();
-    rptPatient.Diastolic = strComments[iCommentsIndex++].trim();
+        rptPatient.strPatient_Fname = strComments[iCommentsIndex++].trim();
+        rptPatient.strPatient_Mname = strComments[iCommentsIndex++].trim();
+        rptPatient.strPatient_Lname = strComments[iCommentsIndex++].trim();
+        SelectedEventID = Integer.parseInt(strComments[iCommentsIndex++].trim());
+        rptPatient.Height = strComments[iCommentsIndex++].trim();
+        rptPatient.Weight = strComments[iCommentsIndex++].trim();
+        rptPatient.Systolic = strComments[iCommentsIndex++].trim();
+        rptPatient.Diastolic = strComments[iCommentsIndex++].trim();
 
-    ecgScan.strCommentsByCardiologist = strComments[iCommentsIndex++].trim();
-    strTemp = strComments[iCommentsIndex++];
-    ecgScan.strScanDate = strComments[iCommentsIndex++].trim();
-    rptPatient.strPatientID = strComments[iCommentsIndex++].trim();
-    ecgScan.Emergency = strComments[iCommentsIndex++].trim().equalsIgnoreCase("1");
-    sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
-    rptPatient.strHistoryConditions = strComments[iCommentsIndex++].trim();
-    sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
-    ecgScan.strReceivedComments = strComments[iCommentsIndex++].trim();
+        ecgScan.strCommentsByCardiologist = strComments[iCommentsIndex++].trim();
+        strTemp = strComments[iCommentsIndex++];
+        ecgScan.strScanDate = strComments[iCommentsIndex++].trim();
+        rptPatient.strPatientID = strComments[iCommentsIndex++].trim();
+        ecgScan.Emergency = strComments[iCommentsIndex++].trim().equalsIgnoreCase("1");
+        sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
+        rptPatient.strHistoryConditions = strComments[iCommentsIndex++].trim();
+        sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
+        ecgScan.strReceivedComments = strComments[iCommentsIndex++].trim();
 //bmp 09-Sep-24
 //HistoryText.length() Not used, replacing it with ReferringDr
 //        sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
-    rptPatient.ReferringDr = strComments[iCommentsIndex++].trim();
-    rptPatient.HistoryText = strComments[iCommentsIndex++].trim();
+        rptPatient.ReferringDr = strComments[iCommentsIndex++].trim();
+        rptPatient.HistoryText = strComments[iCommentsIndex++].trim();
 //bmp 09-Sep-24
 
-    sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
-    Measure.strInterpretation_Status = strComments[iCommentsIndex++].trim();
-    strInterpretation = Measure.strInterpretation_Status;
+        sVal = Short.valueOf(strComments[iCommentsIndex++].trim());
+        Measure.strInterpretation_Status = strComments[iCommentsIndex++].trim();
+        strInterpretation = Measure.strInterpretation_Status;
 
-    //To avoid uninitialized strPatient_Gender in case of old .cmt file
-    rptPatient.strPatient_Gender = "Male";
-    strTemp = strComments[iCommentsIndex++];
-    if(strTemp != null) {
-        rptPatient.strPatient_Gender = "";
-    }
+        //To avoid uninitialized strPatient_Gender in case of old .cmt file
+        rptPatient.strPatient_Gender = "Male";
+        strTemp = strComments[iCommentsIndex++];
+        if(strTemp != null) {
+            rptPatient.strPatient_Gender = strTemp.trim();
+        }
 
-    //To avoid uninitialized strVar in case of old .cmt file
-    ecgScan.strReferingPhysician = "";
-    strTemp = strComments[iCommentsIndex++];
-    if(strTemp != null) {
-        strTemp = strTemp.trim();
-        if(strTemp.length() > 50)
-            strTemp = strTemp.substring(0, 50);
-        ecgScan.strReferingPhysician = strTemp;
-    }
+        //To avoid uninitialized strVar in case of old .cmt file
+        ecgScan.strReferingPhysician = "";
+        strTemp = strComments[iCommentsIndex++];
+        if(strTemp != null) {
+            strTemp = strTemp.trim();
+            if(strTemp.length() > 50)
+                strTemp = strTemp.substring(0, 50);
+            ecgScan.strReferingPhysician = strTemp;
+        }
 
-    //Added by BMP on 15-Nov-2017
-    rptPatient.strPatient_Mailid = "";
-    strTemp = strComments[iCommentsIndex++];
-    if(strTemp != null) {
-        rptPatient.strPatient_Mailid = strTemp.trim();
-    }
+        //Added by BMP on 15-Nov-2017
+        rptPatient.strPatient_Mailid = "";
+        strTemp = strComments[iCommentsIndex++];
+        if(strTemp != null) {
+            rptPatient.strPatient_Mailid = strTemp.trim();
+        }
 
-    rptPatient.BMI = strComments[iCommentsIndex++].trim();
-    rptPatient.TropT = strComments[iCommentsIndex++].trim();
-    rptPatient.Hb = strComments[iCommentsIndex++].trim();
-    rptPatient.HbA1c = strComments[iCommentsIndex++].trim();
-    rptPatient.RBS = strComments[iCommentsIndex++].trim();
-    rptPatient.TC = strComments[iCommentsIndex++].trim();
-    rptPatient.LDL = strComments[iCommentsIndex++].trim();
-    rptPatient.HDL = strComments[iCommentsIndex++].trim();
-    rptPatient.TG = strComments[iCommentsIndex++].trim();
+        rptPatient.BMI = strComments[iCommentsIndex++].trim();
+        rptPatient.TropT = strComments[iCommentsIndex++].trim();
+        rptPatient.Hb = strComments[iCommentsIndex++].trim();
+        rptPatient.HbA1c = strComments[iCommentsIndex++].trim();
+        rptPatient.RBS = strComments[iCommentsIndex++].trim();
+        rptPatient.TC = strComments[iCommentsIndex++].trim();
+        rptPatient.LDL = strComments[iCommentsIndex++].trim();
+        rptPatient.HDL = strComments[iCommentsIndex++].trim();
+        rptPatient.TG = strComments[iCommentsIndex++].trim();
 //bmp 03-Mar-25
-    rptPatient.strIDNumber = strComments[iCommentsIndex++].trim();
+        rptPatient.strIDNumber = strComments[iCommentsIndex++].trim();
 //bmp 03-Mar-25
 
-    if(rptPatient.Weight.isEmpty())
-        rptPatient.Weight = "NA";
-    if(rptPatient.Height.isEmpty())
-        rptPatient.Height = "NA";
-    if(rptPatient.Systolic.isEmpty())
-        rptPatient.Systolic = "NA";
-    if(rptPatient.Diastolic.isEmpty())
-        rptPatient.Diastolic = "NA";
-    if(rptPatient.BMI.isEmpty())
-        rptPatient.BMI = "NA";
-    if(rptPatient.Hb.isEmpty())
-        rptPatient.Hb = "NA";
-    if(rptPatient.HbA1c.isEmpty())
-        rptPatient.HbA1c = "NA";
-    if(rptPatient.RBS.isEmpty())
-        rptPatient.RBS = "NA";
-    if(rptPatient.TC.isEmpty())
-        rptPatient.TC = "NA";
-    if(rptPatient.LDL.isEmpty())
-        rptPatient.LDL = "NA";
-    if(rptPatient.HDL.isEmpty())
-        rptPatient.HDL = "NA";
-    if(rptPatient.TG.isEmpty())
-        rptPatient.TG = "NA";
-}
+        if(rptPatient.Weight.isEmpty())
+            rptPatient.Weight = "NA";
+        if(rptPatient.Height.isEmpty())
+            rptPatient.Height = "NA";
+        if(rptPatient.Systolic.isEmpty())
+            rptPatient.Systolic = "NA";
+        if(rptPatient.Diastolic.isEmpty())
+            rptPatient.Diastolic = "NA";
+        if(rptPatient.BMI.isEmpty())
+            rptPatient.BMI = "NA";
+        if(rptPatient.Hb.isEmpty())
+            rptPatient.Hb = "NA";
+        if(rptPatient.HbA1c.isEmpty())
+            rptPatient.HbA1c = "NA";
+        if(rptPatient.RBS.isEmpty())
+            rptPatient.RBS = "NA";
+        if(rptPatient.TC.isEmpty())
+            rptPatient.TC = "NA";
+        if(rptPatient.LDL.isEmpty())
+            rptPatient.LDL = "NA";
+        if(rptPatient.HDL.isEmpty())
+            rptPatient.HDL = "NA";
+        if(rptPatient.TG.isEmpty())
+            rptPatient.TG = "NA";
+    }
 //bmp 19-Apr-24
 
     @SuppressLint("HandlerLeak")
@@ -5701,7 +5707,7 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //
 //        //vnp 30 dec 15 return uc_Return;
 //        GNCNTR = uc_GNCNTRCopy;
-////        return uc_GNCNTRCopy;
+    ////        return uc_GNCNTRCopy;
 //    }
 
     public void onClick(View v) {
@@ -5830,8 +5836,8 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        InitVertexBuffer();
 //                        DemoStart = true;
 //                    } else {
-                        mNextByte = 1;
-                        InitVertexBuffer();
+                    mNextByte = 1;
+                    InitVertexBuffer();
 //                    }
                     break;
                 case R.id.ButtonQRSLead:
@@ -5943,8 +5949,8 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //                        InitVertexBuffer();
 //                        DemoStart = true;
 //                    } else {
-                        mNextByte = 1;
-                        InitVertexBuffer();
+                    mNextByte = 1;
+                    InitVertexBuffer();
 //                    }
                     break;
                 case R.id.ButtonPreviewSend:
@@ -6076,8 +6082,7 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
                                 RendererSyncObjReleased = true;
 
                                 lead_no = QRSLeadIndex; //vnp 15 may 17
-                               SelectQRSLead_CalculateHR(acqScan); // redundant code psy 01/06/2026Measure.Calculate(getBaseContext(), acqScan);
-
+                                Measure.Calculate(getBaseContext(), acqScan);
                                 acqScan.HRCopy = Measurement.current_HR;
                                 lead_no = QRSLeadIndex; //vnp 2 june 16
                                 if (acqScan.HRCopy > 0) {
@@ -6261,8 +6266,6 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 
         ParseECGReportDB(acqScan, currentPatient);
 
-//***************  reduntant code  psy 01/06/2026
-/*
         SelectQRSLead_CalculateHR(acqScan);
 
         HRCopy = Measurement.current_HR;
@@ -6282,7 +6285,6 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
         } else {
             Measure.strInterpretation_Status = "";
         }
-*/
 
         ParseMeasurementReportDB(acqScan);   //Necessary for prn_current_HR
 
@@ -6642,7 +6644,7 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //        iTemp1 = (int) bytearrayMeasurementData[bytearrayIndex++] & 0x000000FF;
 //        iTemp1 = iTemp1 << 8;
 //        iTemp1 = iTemp1 | ((int) bytearrayMeasurementData[bytearrayIndex++] & 0x000000FF);
-////bmp 09-May-24
+    ////bmp 09-May-24
 //        prn_QRSLead_nJPointPosition = (short) iTemp1;
 //    }
     public void ParseMeasurementReportDB(clsEcgScan ecgScan) {
@@ -6655,7 +6657,7 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //        }
 //        byte[] bytearrayMeasurementData = new byte[7225];
         byte[] bytearrayMeasurementData = new byte[11614];
-        if(Emergency) { // psy 01/06/2026 if(ecgScan.Emergency) {
+        if(ecgScan.Emergency) {
             esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
             // Gets the data repository in write mode
             SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -7919,318 +7921,318 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //
 //            DataSavedLocally = true;
 //
-////            Toast toast = Toast.makeText(getBaseContext(), "Esy-G: ECG Save", Toast.LENGTH_SHORT);
-////            ViewGroup group = (ViewGroup) toast.getView();
-////            TextView messageTextView = (TextView) group.getChildAt(0);
-////            messageTextView.setTextSize(36);
-////            messageTextView.setTextColor(Color.GREEN);
-////            toast.setGravity(Gravity.CENTER, 0, 0);
-////            toast.show();
+    ////            Toast toast = Toast.makeText(getBaseContext(), "Esy-G: ECG Save", Toast.LENGTH_SHORT);
+    ////            ViewGroup group = (ViewGroup) toast.getView();
+    ////            TextView messageTextView = (TextView) group.getChildAt(0);
+    ////            messageTextView.setTextSize(36);
+    ////            messageTextView.setTextColor(Color.GREEN);
+    ////            toast.setGravity(Gravity.CENTER, 0, 0);
+    ////            toast.show();
 //        } catch (Exception e) {
 //            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
 //        }
 //    }
-public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
-    USBDataStreamIn = false;
+    public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
+        USBDataStreamIn = false;
 
-    mNextByte = 0;
-    mCommState = COMM_STATE_VERSION_HEADER;
-    glSurfaceView.onPause();
+        mNextByte = 0;
+        mCommState = COMM_STATE_VERSION_HEADER;
+        glSurfaceView.onPause();
 
-    clsPatient objPatient = new clsPatient();
-    switch(currentPatientType) {
-        case ESY_G_OFFLINE_PATIENT:
-            objPatient = OfflinePatient;
-            break;
-        case ESY_G_ONLINE_PATIENT:
-            objPatient = OnlinePatient;
-            break;
-        case ESY_G_EMERGENCY_PATIENT:
-            objPatient = EmergencyPatient;
-            break;
-    }
-
-    try {
-        Date date = new Date();
-        long lScanTimestamp = date.getTime();
-        String formattedDay = new SimpleDateFormat("dd", Locale.getDefault()).format(date);
-        String formattedMonth = new SimpleDateFormat("MM", Locale.getDefault()).format(date);
-        String formattedYear = new SimpleDateFormat("yyyy", Locale.getDefault()).format(date);
-        String formattedHour = new SimpleDateFormat("HH", Locale.getDefault()).format(date);
-        String formattedMinute = new SimpleDateFormat("mm", Locale.getDefault()).format(date);
-        String formattedSecond = new SimpleDateFormat("ss", Locale.getDefault()).format(date);
-        String formattedDate = new SimpleDateFormat("MM-dd-yyyy-HH-mm-ss", Locale.getDefault()).format(date);
-        String StrFileName = StrHWDeviceID;
-        StrFileName = StrFileName + "-"
-                + formattedDay + "-"
-                + formattedMonth + "-"
-                + formattedYear + "-"
-                + formattedHour + "-"
-                + formattedMinute + "-"
-                + formattedSecond;
-
-        StrFileName = StrFileName + "_" + strI2I_PhysicianName;
-
-        if(Emergency) {
-            objPatient.strPatient_Mname = formattedDay + "-" + formattedMonth + "-" + formattedYear;
-            objPatient.strPatient_Lname = formattedHour + ":" + formattedMinute + ":" + formattedSecond;
+        clsPatient objPatient = new clsPatient();
+        switch(currentPatientType) {
+            case ESY_G_OFFLINE_PATIENT:
+                objPatient = OfflinePatient;
+                break;
+            case ESY_G_ONLINE_PATIENT:
+                objPatient = OnlinePatient;
+                break;
+            case ESY_G_EMERGENCY_PATIENT:
+                objPatient = EmergencyPatient;
+                break;
         }
+
+        try {
+            Date date = new Date();
+            long lScanTimestamp = date.getTime();
+            String formattedDay = new SimpleDateFormat("dd", Locale.getDefault()).format(date);
+            String formattedMonth = new SimpleDateFormat("MM", Locale.getDefault()).format(date);
+            String formattedYear = new SimpleDateFormat("yyyy", Locale.getDefault()).format(date);
+            String formattedHour = new SimpleDateFormat("HH", Locale.getDefault()).format(date);
+            String formattedMinute = new SimpleDateFormat("mm", Locale.getDefault()).format(date);
+            String formattedSecond = new SimpleDateFormat("ss", Locale.getDefault()).format(date);
+            String formattedDate = new SimpleDateFormat("MM-dd-yyyy-HH-mm-ss", Locale.getDefault()).format(date);
+            String StrFileName = StrHWDeviceID;
+            StrFileName = StrFileName + "-"
+                    + formattedDay + "-"
+                    + formattedMonth + "-"
+                    + formattedYear + "-"
+                    + formattedHour + "-"
+                    + formattedMinute + "-"
+                    + formattedSecond;
+
+            StrFileName = StrFileName + "_" + strI2I_PhysicianName;
+
+            if(Emergency) {
+                objPatient.strPatient_Mname = formattedDay + "-" + formattedMonth + "-" + formattedYear;
+                objPatient.strPatient_Lname = formattedHour + ":" + formattedMinute + ":" + formattedSecond;
+            }
 //////////////////////////////////////////////////////////
-        byte[] bytearrayRawData = new byte[161 + (SIZEOF_RECORD_BUFFER * 2 * 12)];
-        int iIndex = 0;
+            byte[] bytearrayRawData = new byte[161 + (SIZEOF_RECORD_BUFFER * 2 * 12)];
+            int iIndex = 0;
 
-        int NoOfBytes;
-        NoOfBytes = 161 + (SIZEOF_RECORD_BUFFER * 2 * 12);
-        bytearrayRawData[iIndex++] = (byte) NoOfBytes;
-        bytearrayRawData[iIndex++] = (byte) (NoOfBytes >> 8);
-        bytearrayRawData[iIndex++] = (byte) (NoOfBytes >> 16);
-        bytearrayRawData[iIndex++] = (byte) (NoOfBytes >> 24);
+            int NoOfBytes;
+            NoOfBytes = 161 + (SIZEOF_RECORD_BUFFER * 2 * 12);
+            bytearrayRawData[iIndex++] = (byte) NoOfBytes;
+            bytearrayRawData[iIndex++] = (byte) (NoOfBytes >> 8);
+            bytearrayRawData[iIndex++] = (byte) (NoOfBytes >> 16);
+            bytearrayRawData[iIndex++] = (byte) (NoOfBytes >> 24);
 
-        if( (objPatient.strPatientID.equalsIgnoreCase("-")) ||
-                (objPatient.strPatientID.isEmpty()) ) {
-            bytearrayRawData[iIndex++] = (byte) 0;
-            bytearrayRawData[iIndex++] = (byte) 0;
-            bytearrayRawData[iIndex++] = (byte) 0;
-            bytearrayRawData[iIndex++] = (byte) 0;
-        } else {
-            int iTempID = Integer.parseInt(objPatient.strPatientID);
-            bytearrayRawData[iIndex++] = (byte) iTempID;
-            bytearrayRawData[iIndex++] = (byte) (iTempID >> 8);
-            bytearrayRawData[iIndex++] = (byte) (iTempID >> 16);
-            bytearrayRawData[iIndex++] = (byte) (iTempID >> 24);
-        }
-
-        bytearrayRawData[iIndex++] = (byte) 1;
-        bytearrayRawData[iIndex++] = (byte) 1;
-
-        String Str = LongLead.substring(5);
-        for (int i = 0; i < 12; i++) {
-            if (LEADS[i].equalsIgnoreCase(Str)) {
-                bytearrayRawData[iIndex++] = (byte) i;
-                break;
+            if( (objPatient.strPatientID.equalsIgnoreCase("-")) ||
+                    (objPatient.strPatientID.isEmpty()) ) {
+                bytearrayRawData[iIndex++] = (byte) 0;
+                bytearrayRawData[iIndex++] = (byte) 0;
+                bytearrayRawData[iIndex++] = (byte) 0;
+                bytearrayRawData[iIndex++] = (byte) 0;
+            } else {
+                int iTempID = Integer.parseInt(objPatient.strPatientID);
+                bytearrayRawData[iIndex++] = (byte) iTempID;
+                bytearrayRawData[iIndex++] = (byte) (iTempID >> 8);
+                bytearrayRawData[iIndex++] = (byte) (iTempID >> 16);
+                bytearrayRawData[iIndex++] = (byte) (iTempID >> 24);
             }
-        }
 
-        Str = QRSLead.substring(5);
-        for (int i = 0; i < 12; i++) {
-            if (LEADS[i].equalsIgnoreCase(Str)) {
-                bytearrayRawData[iIndex++] = (byte) i;
-                break;
-            }
-        }
-
-        bytearrayRawData[iIndex++] = (byte) Integer.parseInt(ASAAN_PRO_VERSION.substring(0, 1));
-        String strAPKSubVersion = ASAAN_PRO_VERSION.substring(2, 3) + ASAAN_PRO_VERSION.substring(4, 5);
-        bytearrayRawData[iIndex++] = (byte) Integer.parseInt(strAPKSubVersion);
-        bytearrayRawData[iIndex++] = (byte) HWMainVersion;
-        bytearrayRawData[iIndex++] = (byte) HWSubVersion;
-
-        bytearrayRawData[iIndex++] = (byte) 0;
-        bytearrayRawData[iIndex++] = (byte) 0;
-
-        if (Emergency)
             bytearrayRawData[iIndex++] = (byte) 1;
-        else
+            bytearrayRawData[iIndex++] = (byte) 1;
+
+            String Str = LongLead.substring(5);
+            for (int i = 0; i < 12; i++) {
+                if (LEADS[i].equalsIgnoreCase(Str)) {
+                    bytearrayRawData[iIndex++] = (byte) i;
+                    break;
+                }
+            }
+
+            Str = QRSLead.substring(5);
+            for (int i = 0; i < 12; i++) {
+                if (LEADS[i].equalsIgnoreCase(Str)) {
+                    bytearrayRawData[iIndex++] = (byte) i;
+                    break;
+                }
+            }
+
+            bytearrayRawData[iIndex++] = (byte) Integer.parseInt(ASAAN_PRO_VERSION.substring(0, 1));
+            String strAPKSubVersion = ASAAN_PRO_VERSION.substring(2, 3) + ASAAN_PRO_VERSION.substring(4, 5);
+            bytearrayRawData[iIndex++] = (byte) Integer.parseInt(strAPKSubVersion);
+            bytearrayRawData[iIndex++] = (byte) HWMainVersion;
+            bytearrayRawData[iIndex++] = (byte) HWSubVersion;
+
+            bytearrayRawData[iIndex++] = (byte) 0;
             bytearrayRawData[iIndex++] = (byte) 0;
 
-        bytearrayRawData[iIndex++] = (byte) 0;
-        bytearrayRawData[iIndex++] = (byte) 0;
+            if (Emergency)
+                bytearrayRawData[iIndex++] = (byte) 1;
+            else
+                bytearrayRawData[iIndex++] = (byte) 0;
 
-        byte[] byteTechnicianName = String.format(Locale.getDefault(), "%-35s", TechnicianName).getBytes();
-        for(int i=0; i<35; i++)
-            bytearrayRawData[iIndex++] = byteTechnicianName[i];
+            bytearrayRawData[iIndex++] = (byte) 0;
+            bytearrayRawData[iIndex++] = (byte) 0;
 
-        byte[] byteInstrumentName = String.format(Locale.getDefault(), "%-35s", InstrumentName).getBytes();
-        for(int i=0; i<35; i++)
-            bytearrayRawData[iIndex++] = byteInstrumentName[i];
+            byte[] byteTechnicianName = String.format(Locale.getDefault(), "%-35s", TechnicianName).getBytes();
+            for(int i=0; i<35; i++)
+                bytearrayRawData[iIndex++] = byteTechnicianName[i];
 
-        for(int i=0; i<Measure.nInterpretation_Status.length; i++) {
-            bytearrayRawData[iIndex++] = (byte) Measure.nInterpretation_Status[i];
-        }
+            byte[] byteInstrumentName = String.format(Locale.getDefault(), "%-35s", InstrumentName).getBytes();
+            for(int i=0; i<35; i++)
+                bytearrayRawData[iIndex++] = byteInstrumentName[i];
 
-        Measurement.Display_Amplitudes_in_millivolts(QRSLeadIndex);
-        for (int i = 0; i < 9; i++) {
-            float flTemp = Measurement.Dispaly_Amplitude_Buffer[i];
-            short sTemp = (short)(flTemp * 1000.0);
-            bytearrayRawData[iIndex++] = (byte) sTemp;
-            bytearrayRawData[iIndex++] = (byte) (sTemp >> 8);
-        }
+            for(int i=0; i<Measure.nInterpretation_Status.length; i++) {
+                bytearrayRawData[iIndex++] = (byte) Measure.nInterpretation_Status[i];
+            }
 
-        Measurement.Display_Duration_in_millisecs(QRSLeadIndex);
-        for(int i=0; i<8; i++) {
-            short sTemp = Measurement.nDuration[i];
-            bytearrayRawData[iIndex++] = (byte) sTemp;
-            bytearrayRawData[iIndex++] = (byte) (sTemp >> 8);
-        }
+            Measurement.Display_Amplitudes_in_millivolts(QRSLeadIndex);
+            for (int i = 0; i < 9; i++) {
+                float flTemp = Measurement.Dispaly_Amplitude_Buffer[i];
+                short sTemp = (short)(flTemp * 1000.0);
+                bytearrayRawData[iIndex++] = (byte) sTemp;
+                bytearrayRawData[iIndex++] = (byte) (sTemp >> 8);
+            }
 
-        Measurement.Display_Interval_in_millisecs(QRSLeadIndex);
-        for (int i = 8; i < 12; i++) {
-            short sTemp = Measurement.nInterval[i - 8];
-            bytearrayRawData[iIndex++] = (byte) sTemp;
-            bytearrayRawData[iIndex++] = (byte) (sTemp >> 8);
-        }
+            Measurement.Display_Duration_in_millisecs(QRSLeadIndex);
+            for(int i=0; i<8; i++) {
+                short sTemp = Measurement.nDuration[i];
+                bytearrayRawData[iIndex++] = (byte) sTemp;
+                bytearrayRawData[iIndex++] = (byte) (sTemp >> 8);
+            }
 
-        short sTemp1 = (short) Measurement.nAxis[0];
-        bytearrayRawData[iIndex++] = (byte) sTemp1;
-        bytearrayRawData[iIndex++] = (byte) (sTemp1 >> 8);
-        short sTemp2 = (short) Measurement.nAxis[1];
-        bytearrayRawData[iIndex++] = (byte) sTemp2;
-        bytearrayRawData[iIndex++] = (byte) (sTemp2 >> 8);
-        short sTemp3 = (short) Measurement.nAxis[2];
-        bytearrayRawData[iIndex++] = (byte) sTemp3;
-        bytearrayRawData[iIndex++] = (byte) (sTemp3 >> 8);
+            Measurement.Display_Interval_in_millisecs(QRSLeadIndex);
+            for (int i = 8; i < 12; i++) {
+                short sTemp = Measurement.nInterval[i - 8];
+                bytearrayRawData[iIndex++] = (byte) sTemp;
+                bytearrayRawData[iIndex++] = (byte) (sTemp >> 8);
+            }
 
-        bytearrayRawData[iIndex++] = (byte) acqScan.HRCopy;
-        bytearrayRawData[iIndex++] = (byte) (acqScan.HRCopy >> 8);
+            short sTemp1 = (short) Measurement.nAxis[0];
+            bytearrayRawData[iIndex++] = (byte) sTemp1;
+            bytearrayRawData[iIndex++] = (byte) (sTemp1 >> 8);
+            short sTemp2 = (short) Measurement.nAxis[1];
+            bytearrayRawData[iIndex++] = (byte) sTemp2;
+            bytearrayRawData[iIndex++] = (byte) (sTemp2 >> 8);
+            short sTemp3 = (short) Measurement.nAxis[2];
+            bytearrayRawData[iIndex++] = (byte) sTemp3;
+            bytearrayRawData[iIndex++] = (byte) (sTemp3 >> 8);
 
-        short sRRInterval = Measurement.RR_Interval;
-        sRRInterval = (short)(sRRInterval * 4);     //(1/250)*1000 for sRRInterval in msec
-        bytearrayRawData[iIndex++] = (byte) sRRInterval;
-        bytearrayRawData[iIndex++] = (byte) (sRRInterval >> 8);
+            bytearrayRawData[iIndex++] = (byte) acqScan.HRCopy;
+            bytearrayRawData[iIndex++] = (byte) (acqScan.HRCopy >> 8);
 
-        short sTemp, sVal, sCurrentIndex, tempIndex;
-        sCurrentIndex = mWriteLeadDataIndex;
+            short sRRInterval = Measurement.RR_Interval;
+            sRRInterval = (short)(sRRInterval * 4);     //(1/250)*1000 for sRRInterval in msec
+            bytearrayRawData[iIndex++] = (byte) sRRInterval;
+            bytearrayRawData[iIndex++] = (byte) (sRRInterval >> 8);
 
-        for (short k = 0; k < 12; k++) {
-            //vnp 2 july 16  sTemp = LEAD_INDEX[k];
-            sTemp=k;  //vnp 2 july 16
-            tempIndex = sCurrentIndex;
-            for (int j = 0; j < SIZEOF_RECORD_BUFFER; j++) {
-                sVal = 0;
-                switch (sTemp) {
-                    case 0:
-                        sVal = acqScan.ECGLeadData0[tempIndex];
-                        break;
-                    case 1:
-                        sVal = acqScan.ECGLeadData1[tempIndex];
-                        break;
-                    case 2:
-                        sVal = acqScan.ECGLeadData2[tempIndex];
-                        break;
-                    case 3:
-                        sVal = acqScan.ECGLeadData3[tempIndex];
-                        break;
-                    case 4:
-                        sVal = acqScan.ECGLeadData4[tempIndex];
-                        break;
-                    case 5:
-                        sVal = acqScan.ECGLeadData5[tempIndex];
-                        break;
-                    case 6:
-                        sVal = acqScan.ECGLeadData6[tempIndex];
-                        break;
-                    case 7:
-                        sVal = acqScan.ECGLeadData7[tempIndex];
-                        break;
-                    case 8:
-                        sVal = acqScan.ECGLeadData8[tempIndex];
-                        break;
-                    case 9:
-                        sVal = acqScan.ECGLeadData9[tempIndex];
-                        break;
-                    case 10:
-                        sVal = acqScan.ECGLeadData10[tempIndex];
-                        break;
-                    case 11:
-                        sVal = acqScan.ECGLeadData11[tempIndex];
-                        break;
+            short sTemp, sVal, sCurrentIndex, tempIndex;
+            sCurrentIndex = mWriteLeadDataIndex;
+
+            for (short k = 0; k < 12; k++) {
+                //vnp 2 july 16  sTemp = LEAD_INDEX[k];
+                sTemp=k;  //vnp 2 july 16
+                tempIndex = sCurrentIndex;
+                for (int j = 0; j < SIZEOF_RECORD_BUFFER; j++) {
+                    sVal = 0;
+                    switch (sTemp) {
+                        case 0:
+                            sVal = acqScan.ECGLeadData0[tempIndex];
+                            break;
+                        case 1:
+                            sVal = acqScan.ECGLeadData1[tempIndex];
+                            break;
+                        case 2:
+                            sVal = acqScan.ECGLeadData2[tempIndex];
+                            break;
+                        case 3:
+                            sVal = acqScan.ECGLeadData3[tempIndex];
+                            break;
+                        case 4:
+                            sVal = acqScan.ECGLeadData4[tempIndex];
+                            break;
+                        case 5:
+                            sVal = acqScan.ECGLeadData5[tempIndex];
+                            break;
+                        case 6:
+                            sVal = acqScan.ECGLeadData6[tempIndex];
+                            break;
+                        case 7:
+                            sVal = acqScan.ECGLeadData7[tempIndex];
+                            break;
+                        case 8:
+                            sVal = acqScan.ECGLeadData8[tempIndex];
+                            break;
+                        case 9:
+                            sVal = acqScan.ECGLeadData9[tempIndex];
+                            break;
+                        case 10:
+                            sVal = acqScan.ECGLeadData10[tempIndex];
+                            break;
+                        case 11:
+                            sVal = acqScan.ECGLeadData11[tempIndex];
+                            break;
+                    }
+                    bytearrayRawData[iIndex++] = (byte) sVal;
+                    sVal = (short) (sVal >> 8);
+                    sVal = (short) (sVal & 0x000F);
+                    bytearrayRawData[iIndex++] = (byte) sVal;
+
+                    tempIndex = (short) (tempIndex + 1);
+                    if (tempIndex > MAX_RECORD_BUFFER_INDEX)
+                        tempIndex = 0;
                 }
-                bytearrayRawData[iIndex++] = (byte) sVal;
-                sVal = (short) (sVal >> 8);
-                sVal = (short) (sVal & 0x000F);
-                bytearrayRawData[iIndex++] = (byte) sVal;
-
-                tempIndex = (short) (tempIndex + 1);
-                if (tempIndex > MAX_RECORD_BUFFER_INDEX)
-                    tempIndex = 0;
             }
-        }
 
-        mLastFileName = StrFileName;
-        acqScan.strScanFileName = StrFileName;
-        if(StrHWDeviceID.length() == 10) {
-            acqScan.strScanDate = StrFileName.substring(11, 21);
-        } else {
-            acqScan.strScanDate = StrFileName.substring(13, 23);
-        }
-        SaveHWVersion();
-        ///////////////////////////////////////////////////////////
-        String Comments = "";
-        String CommentsBy = "";
-        String CommentsBy_Fname = "";
-        String CommentsBy_Lname = "";
-        String CommentsDate = acqScan.strScanDate;
-        String strComments = "";
-
-        strComments = strComments + objPatient.strPatient_Mobile + "\n";
-        strComments = strComments + objPatient.strPatient_DOB + "\n";
-        strComments = strComments + objPatient.strPatient_Fname + "\n";
-        strComments = strComments + objPatient.strPatient_Mname + "\n";
-        strComments = strComments + objPatient.strPatient_Lname + "\n";
-        strComments = strComments + String.valueOf(SelectedEventID) + "\n";
-        strComments = strComments + objPatient.Height + "\n";
-        strComments = strComments + objPatient.Weight + "\n";
-        strComments = strComments + objPatient.Systolic + "\n";
-        strComments = strComments + objPatient.Diastolic + "\n";
-        strComments = strComments + CommentsBy_Fname + "\n";
-        strComments = strComments + CommentsBy_Lname + "\n";
-        strComments = strComments + CommentsDate + "\n";
-        strComments = strComments + objPatient.strPatientID + "\n";
-        if(Emergency)
-            strComments = strComments + "1";
-        else
-            strComments = strComments + "0";
-        strComments = strComments + "\n";
-        if(objPatient.strHistoryConditions == null)
-            objPatient.strHistoryConditions = " ";
-        strComments = strComments + String.valueOf(objPatient.strHistoryConditions.length()) + "\n";
-        strComments = strComments + objPatient.strHistoryConditions + "\n";
-        if(Comments == null)
-            Comments = " ";
-        strComments = strComments + String.valueOf(Comments.length()) + "\n";
-        strComments = strComments + Comments + "\n";
-
-        if(objPatient.ReferringDr == null)
-            objPatient.ReferringDr = " ";
-        strComments = strComments + objPatient.ReferringDr + "\n";
-
-        if(objPatient.HistoryText == null)
-            objPatient.HistoryText = " ";
-        strComments = strComments + objPatient.HistoryText + "\n";
-
-        String strInterpret = "";
-        if(Measure.strInterpretation_Status == null)
-            Measure.strInterpretation_Status = " ";
-        if(Measure.strInterpretation_Status.length() <= 256) {
-            strInterpret = Measure.strInterpretation_Status;
-            for (int i = Measure.strInterpretation_Status.length(); i < 256; i++) {
-                strInterpret = strInterpret + " ";
+            mLastFileName = StrFileName;
+            acqScan.strScanFileName = StrFileName;
+            if(StrHWDeviceID.length() == 10) {
+                acqScan.strScanDate = StrFileName.substring(11, 21);
+            } else {
+                acqScan.strScanDate = StrFileName.substring(13, 23);
             }
-        } else {
-            strInterpret = Measure.strInterpretation_Status.substring(0, 256);
-        }
-        strComments = strComments + String.valueOf(strInterpret.length()) + "\n";
-        strComments = strComments + strInterpret + "\n";
-        strComments = strComments + objPatient.strPatient_Gender + "\n";
-        if(strI2I_PhysicianName == null)
-            strI2I_PhysicianName = " ";
-        strComments = strComments + strI2I_PhysicianName + "\n";
-        if(objPatient.strPatient_Mailid == null)
-            objPatient.strPatient_Mailid = " ";
-        strComments = strComments + objPatient.strPatient_Mailid + "\n";
-        strComments = strComments + objPatient.BMI + "\n";
-        strComments = strComments + objPatient.TropT + "\n";
-        strComments = strComments + objPatient.Hb + "\n";
-        strComments = strComments + objPatient.HbA1c + "\n";
-        strComments = strComments + objPatient.RBS + "\n";
-        strComments = strComments + objPatient.TC + "\n";
-        strComments = strComments + objPatient.LDL + "\n";
-        strComments = strComments + objPatient.HDL + "\n";
-        strComments = strComments + objPatient.TG + "\n";
+            SaveHWVersion();
+            ///////////////////////////////////////////////////////////
+            String Comments = "";
+            String CommentsBy = "";
+            String CommentsBy_Fname = "";
+            String CommentsBy_Lname = "";
+            String CommentsDate = acqScan.strScanDate;
+            String strComments = "";
+
+            strComments = strComments + objPatient.strPatient_Mobile + "\n";
+            strComments = strComments + objPatient.strPatient_DOB + "\n";
+            strComments = strComments + objPatient.strPatient_Fname + "\n";
+            strComments = strComments + objPatient.strPatient_Mname + "\n";
+            strComments = strComments + objPatient.strPatient_Lname + "\n";
+            strComments = strComments + String.valueOf(SelectedEventID) + "\n";
+            strComments = strComments + objPatient.Height + "\n";
+            strComments = strComments + objPatient.Weight + "\n";
+            strComments = strComments + objPatient.Systolic + "\n";
+            strComments = strComments + objPatient.Diastolic + "\n";
+            strComments = strComments + CommentsBy_Fname + "\n";
+            strComments = strComments + CommentsBy_Lname + "\n";
+            strComments = strComments + CommentsDate + "\n";
+            strComments = strComments + objPatient.strPatientID + "\n";
+            if(Emergency)
+                strComments = strComments + "1";
+            else
+                strComments = strComments + "0";
+            strComments = strComments + "\n";
+            if(objPatient.strHistoryConditions == null)
+                objPatient.strHistoryConditions = " ";
+            strComments = strComments + String.valueOf(objPatient.strHistoryConditions.length()) + "\n";
+            strComments = strComments + objPatient.strHistoryConditions + "\n";
+            if(Comments == null)
+                Comments = " ";
+            strComments = strComments + String.valueOf(Comments.length()) + "\n";
+            strComments = strComments + Comments + "\n";
+
+            if(objPatient.ReferringDr == null)
+                objPatient.ReferringDr = " ";
+            strComments = strComments + objPatient.ReferringDr + "\n";
+
+            if(objPatient.HistoryText == null)
+                objPatient.HistoryText = " ";
+            strComments = strComments + objPatient.HistoryText + "\n";
+
+            String strInterpret = "";
+            if(Measure.strInterpretation_Status == null)
+                Measure.strInterpretation_Status = " ";
+            if(Measure.strInterpretation_Status.length() <= 256) {
+                strInterpret = Measure.strInterpretation_Status;
+                for (int i = Measure.strInterpretation_Status.length(); i < 256; i++) {
+                    strInterpret = strInterpret + " ";
+                }
+            } else {
+                strInterpret = Measure.strInterpretation_Status.substring(0, 256);
+            }
+            strComments = strComments + String.valueOf(strInterpret.length()) + "\n";
+            strComments = strComments + strInterpret + "\n";
+            strComments = strComments + objPatient.strPatient_Gender + "\n";
+            if(strI2I_PhysicianName == null)
+                strI2I_PhysicianName = " ";
+            strComments = strComments + strI2I_PhysicianName + "\n";
+            if(objPatient.strPatient_Mailid == null)
+                objPatient.strPatient_Mailid = " ";
+            strComments = strComments + objPatient.strPatient_Mailid + "\n";
+            strComments = strComments + objPatient.BMI + "\n";
+            strComments = strComments + objPatient.TropT + "\n";
+            strComments = strComments + objPatient.Hb + "\n";
+            strComments = strComments + objPatient.HbA1c + "\n";
+            strComments = strComments + objPatient.RBS + "\n";
+            strComments = strComments + objPatient.TC + "\n";
+            strComments = strComments + objPatient.LDL + "\n";
+            strComments = strComments + objPatient.HDL + "\n";
+            strComments = strComments + objPatient.TG + "\n";
 //bmp 03-Mar-25
-        strComments = strComments + objPatient.strIDNumber + "\n";
+            strComments = strComments + objPatient.strIDNumber + "\n";
 //bmp 03-Mar-25
-        ///////////////////////////////////////////////////////////
+            ///////////////////////////////////////////////////////////
             if(Emergency) {
                 //Append EmergencySampleList
                 String strTemp = formattedDay + formattedHour + formattedMinute + formattedSecond;
@@ -8282,8 +8284,8 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 newScan.strScan = mLastFileName;
 //bmp 10-Apr-25
 //                newScan.iStatus = SAMPLE_STATUS_COLLECTED;
-        //Change Scan status only after user clicks 'Send' on ECG Preview screen ???
-        //Or when 'PreviewBeforeSend' is false and user clicks 'Send' on ECG Acquisition screen ???
+                //Change Scan status only after user clicks 'Send' on ECG Preview screen ???
+                //Or when 'PreviewBeforeSend' is false and user clicks 'Send' on ECG Acquisition screen ???
                 if(PreviewBeforeSend) {
                     newScan.iStatus = SAMPLE_STATUS_PREVIEW;
                 } else {
@@ -8327,20 +8329,20 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 db.close();
             }
 ////////////////////////////////////////////////////
-        //Remove oldest sample if NoOfPatients > MAX_NUM_OF_PATIENTS
-        if( alECGScan.size() > MAX_NUM_OF_PATIENTS ) {
+            //Remove oldest sample if NoOfPatients > MAX_NUM_OF_PATIENTS
+            if( alECGScan.size() > MAX_NUM_OF_PATIENTS ) {
 //                //Delete sample raw data file
-            RemovePatientSampleFile(MAX_NUM_OF_PATIENTS);
-            alECGScan.remove(MAX_NUM_OF_PATIENTS);
-        }
+                RemovePatientSampleFile(MAX_NUM_OF_PATIENTS);
+                alECGScan.remove(MAX_NUM_OF_PATIENTS);
+            }
 
-        UpdatePendingSyncSampleList();
-        ///////////////////////////////////////////////////////////
-        DataSavedLocally = true;
-    } catch (Exception e) {
-        Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            UpdatePendingSyncSampleList();
+            ///////////////////////////////////////////////////////////
+            DataSavedLocally = true;
+        } catch (Exception e) {
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
-}
     public void SaveMeasurementDataDB(clsEcgScan ecgScan) {
         try {
             //(1)+(12 * 9 * 5 = 540)+(2)+(12 * 2 * 430 = 10320)+(12 * 8 * 3 = 288)+(12 * 4 * 3 = 144)
@@ -9333,19 +9335,19 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                    int iIndex = alEmergencyScan.size() - 1;
 //                    alEmergencyScan.get(iIndex).iStatus = SAMPLE_STATUS_COLLECTED;
 //                } else {
-                alECGScan.get(1).iStatus = SAMPLE_STATUS_COLLECTED;
+                    alECGScan.get(1).iStatus = SAMPLE_STATUS_COLLECTED;
 //                }
 
-                esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
-                // Gets the data repository in write mode
-                SQLiteDatabase db = mDbHelper.getWritableDatabase();
-                ContentValues values1 = new ContentValues();
-                values1.put(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleStatus, alECGScan.get(1).iStatus);
-                String whereClause = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + alECGScan.get(1).strScan + "'";
-                long lTemp1 = db.update(esygDbContract.PatientSamplesDB.TABLE_NAME, values1, whereClause, null);
-                db.close();
+                    esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
+                    // Gets the data repository in write mode
+                    SQLiteDatabase db = mDbHelper.getWritableDatabase();
+                    ContentValues values1 = new ContentValues();
+                    values1.put(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleStatus, alECGScan.get(1).iStatus);
+                    String whereClause = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + alECGScan.get(1).strScan + "'";
+                    long lTemp1 = db.update(esygDbContract.PatientSamplesDB.TABLE_NAME, values1, whereClause, null);
+                    db.close();
 
-                UpdatePendingSyncSampleList();
+                    UpdatePendingSyncSampleList();
 //bmp 10-Apr-25
                     InitMain();
 
@@ -9418,163 +9420,62 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 textView.setTextSize(30);
                 break;
             case R.id.buttonEmailReport:
-
                 PrevLayoutResourceID = R.layout.activity_sample_status;
-
-                String StrPDFReportPreview =
-                        getBaseContext().getCacheDir()
-                                + File.separator
-                                + "Preview.pdf";
-
-                File previewFile = new File(StrPDFReportPreview);
-
-                Log.e("PDF_PATH", previewFile.getAbsolutePath());
-
-                if (previewFile.exists() && previewFile.length() > 0) {
-
-                    // Timestamp filename
+//                String StrPDFReportPreview = baseDir + "/data/" + "Preview" + ".pdf";
+                String StrPDFReportPreview = getBaseContext().getCacheDir() + File.separator + "Preview" + ".pdf";
+                File pdfFile = new File(StrPDFReportPreview);
+                if (pdfFile.exists()) {
                     mLastFileName = alECGScan.get(CurrentPatientIndex).strScan;
+//                    String StrPDFReportFileName = baseDir + "/data/" + mLastFileName + ".pdf";
+                    String StrPDFReportFileName = getBaseContext().getCacheDir() + File.separator + mLastFileName + ".pdf";
+                    File rptFile = new File(StrPDFReportFileName);
+                    pdfFile.renameTo(rptFile);
 
-                    File newPdfFile = new File(
-                            getBaseContext().getCacheDir(),
-                            mLastFileName + ".pdf"
-                    );
+                    strEmailAttachment = StrPDFReportFileName;
+                    EmailReport();
 
-                    try {
-
-                        FileInputStream fis = new FileInputStream(previewFile);
-
-                        FileOutputStream fos = new FileOutputStream(newPdfFile);
-
-                        byte[] buffer = new byte[4096];
-
-                        int bytesRead;
-
-                        while ((bytesRead = fis.read(buffer)) != -1) {
-
-                            fos.write(buffer, 0, bytesRead);
-
-                        }
-
-                        fos.flush();
-
-                        fos.getFD().sync();
-
-                        fis.close();
-
-                        fos.close();
-
-                        Log.e("PDF_COPY", "Copy Success");
-
-                    } catch (Exception e) {
-
-                        Log.e("PDF_COPY", "Copy Failed", e);
-
-                    }
-
-                    // Attach timestamp PDF
-                    strEmailAttachment = newPdfFile.getAbsolutePath();
-
-                    File finalFile = new File(strEmailAttachment);
-
-                    Log.e("PDF_ATTACH", strEmailAttachment);
-
-                    Log.e("PDF_SIZE", String.valueOf(finalFile.length()));
-
-                    if (finalFile.exists() && finalFile.length() > 0) {
-
-                        EmailReport();
-
-                        dlgState = ESY_G_DIALOG_STATE_PRINT_SUCCESS;
-
-                        dlgAlert.setMessage("Email sent.");
-
-                         dialog = dlgAlert.create();
-
-                        dialog.show();
-
-                         textView = (TextView) dialog.findViewById(android.R.id.message);
-
-                        textView.setTextSize(30);
-
-                    } else {
-
-                        Log.e("PDF_ERROR", "Final PDF corrupted");
-
-                    }
-
-                } else {
-
-                    Log.e("PDF_ERROR", "Preview PDF missing or empty");
-
-                    dlgAlert.setMessage("PDF not generated properly.");
-
-                     dialog = dlgAlert.create();
-
+                    dlgState = ESY_G_DIALOG_STATE_PRINT_SUCCESS;
+                    dlgAlert.setMessage("Email sent.");
+                    dialog = dlgAlert.create();
                     dialog.show();
-
+                    textView = (TextView) dialog.findViewById(android.R.id.message);
+                    textView.setTextSize(30);
                 }
-
                 break;
         }
     }
 
     public void EmailReport() {
+        Intent sendIntent;
+        sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "");
+        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {strDrEmailAddress});
+        sendIntent.putExtra(Intent.EXTRA_CC, new String[] {ReportPatient.strPatient_Mailid});
 
-        try {
-
-            Intent sendIntent = new Intent(Intent.ACTION_SEND);
-
-            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "ECG Report");
-
-            sendIntent.putExtra(Intent.EXTRA_TEXT, "Please find attached ECG report.");
-
-            sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{strDrEmailAddress});
-
-            sendIntent.putExtra(Intent.EXTRA_CC, new String[]{ReportPatient.strPatient_Mailid});
-
-            File pdfFile = new File(strEmailAttachment);
-
-            Log.e("EMAIL_FILE", pdfFile.getAbsolutePath());
-
-            Log.e("EMAIL_FILE", "Exists = " + pdfFile.exists());
-
-            Log.e("EMAIL_FILE", "Size = " + pdfFile.length());
-
-            if (!pdfFile.exists() || pdfFile.length() <= 0) {
-
-                Toast.makeText(getBaseContext(), "PDF file missing or empty", Toast.LENGTH_LONG).show();
-
-                return;
-            }
-
-            Uri senduri = FileProvider.getUriForFile(
-                    getApplicationContext(),
-                    getApplicationContext().getPackageName() + ".provider",
-                    pdfFile
-            );
-
-            sendIntent.putExtra(Intent.EXTRA_STREAM, senduri);
-
-            // IMPORTANT
-            sendIntent.setType("application/pdf");
-
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            // Gmail only
-            sendIntent.setPackage("com.google.android.gm");
-
-            dlgState = ESY_G_DIALOG_STATE_NOT_FOREGROUND;
-
-            startActivity(sendIntent);
-
-        } catch (Exception e) {
-
-            Log.e("EMAIL_ERROR", "Email failed", e);
-
-            Toast.makeText(getBaseContext(), "Gmail not installed or Email failed", Toast.LENGTH_LONG).show();
+        File pdfFile = new File(strEmailAttachment);
+        if(pdfFile.exists()) {
+            Toast.makeText(getBaseContext(), strEmailAttachment, Toast.LENGTH_SHORT).show();
+        } else {
+            String Str1 = "pdfFile.exists false: " + strEmailAttachment;
+            Toast.makeText(getBaseContext(), Str1, Toast.LENGTH_SHORT).show();
+            sendIntent.putExtra(Intent.EXTRA_TEXT, Str1);
         }
+
+        pdfFile.setReadable(true, false);
+//        Uri senduri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", pdfFile);
+        Uri senduri = FileProvider.getUriForFile(getBaseContext(), getBaseContext().getPackageName() + ".provider", pdfFile);
+        sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, senduri);
+
+        sendIntent.setType("message/rfc822");
+        sendIntent.setPackage("com.google.android.gm");
+//        sendIntent.setType("application/pdf");
+
+        dlgState = ESY_G_DIALOG_STATE_NOT_FOREGROUND;
+        startActivityIntent.launch(sendIntent);
     }
+
     ActivityResultLauncher<Intent> startActivityIntent = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -9897,7 +9798,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            OutputStream os = urlConnection.getOutputStream();
 //            byte[] postDataBytes = postDataParams.toString().getBytes("UTF-8");
 //            os.write(postDataBytes);
-////                os.flush();
+    ////                os.flush();
 //            os.close();
 //
 //            String strpostDataParams = postDataParams.toString();
@@ -9995,7 +9896,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //        @Override
 //        protected Void doInBackground(String... params) {
 //            PatientListResponseReceived = false;
-////            getPatientList();
+    ////            getPatientList();
 //            WaitingForPatientList = true;
 //            while (WaitingForPatientList) {
 //                try {
@@ -10183,7 +10084,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         }
         return result.toString();
     }
-//    public boolean GetDeviceLocation() {
+    //    public boolean GetDeviceLocation() {
 //        boolean bFlag = false;
 //        if (ActivityCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 //            // TODO: Consider calling
@@ -10317,9 +10218,9 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                    JSONObject jo = new JSONObject(strOutput);
 //                    if (jo.getString("IsSuccess").equalsIgnoreCase("true")) {
 //                        NasanI2I_Token = jo.getString("Response");
-////bmp 21-Mar-24
-////                        GenerateTokenResponseReceived = true;
-////bmp 21-Mar-24
+    ////bmp 21-Mar-24
+    ////                        GenerateTokenResponseReceived = true;
+    ////bmp 21-Mar-24
 //                        bFlag = true;
 //                    }
 //                }
@@ -10419,7 +10320,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            OutputStream os = urlConnection.getOutputStream();
 //            byte[] postDataBytes = postDataParams.toString().getBytes("UTF-8");
 //            os.write(postDataBytes);
-////                os.flush();
+    ////                os.flush();
 //            os.close();
 //
 //            int responseCode=urlConnection.getResponseCode();
@@ -10520,7 +10421,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            urlConnection.setRequestProperty("Content-Type", "application/json");
 //
 //            urlConnection.setUseCaches(false);
-////            urlConnection.setDoOutput(true);
+    ////            urlConnection.setDoOutput(true);
 //            urlConnection.setDoInput(true);
 //            urlConnection.setChunkedStreamingMode(0);
 //
@@ -10781,9 +10682,9 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                br.close();
 //            }
 //            urlConnection.disconnect();
-////bmp 21-Mar-24
-////            EsyGOnline = bTest;
-////bmp 21-Mar-24
+    ////bmp 21-Mar-24
+    ////            EsyGOnline = bTest;
+    ////bmp 21-Mar-24
 //        } catch (Exception e) {
 //            e.printStackTrace();
 //        }
@@ -10860,7 +10761,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            urlConnection.setRequestProperty("token", NasanI2I_Token);
 //
 //            urlConnection.setUseCaches(false);
-////                urlConnection.setDoOutput(true);
+    ////                urlConnection.setDoOutput(true);
 //            urlConnection.setDoInput(true);
 //            urlConnection.setChunkedStreamingMode(0);
 //
@@ -11044,7 +10945,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                    asyncScan.strScanFileName + ".pdf" + "\"" + "\r\n");
 //            os.writeBytes("\r\n");
 //
-////            String StrPDFReportFileName = baseDir + "/" + asyncScan.strScanFileName + ".pdf";
+    ////            String StrPDFReportFileName = baseDir + "/" + asyncScan.strScanFileName + ".pdf";
 //            String StrPDFReportFileName = getBaseContext().getCacheDir() + File.separator + asyncScan.strScanFileName + ".pdf";
 //            File uploadFile = new File(StrPDFReportFileName);
 //            FileInputStream inputStream = new FileInputStream(uploadFile);
@@ -11451,18 +11352,18 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //        try {
 //            try {
 //                document.writeTo(new FileOutputStream(PdfFile));
-////                ByteArrayOutputStream bytearrayOutputStream = new ByteArrayOutputStream();
-////                document.writeTo(bytearrayOutputStream);
-////                esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
-////                // Gets the data repository in write mode
-////                SQLiteDatabase db = mDbHelper.getWritableDatabase();
-////                ContentValues values1 = new ContentValues();
-////                values1.put(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSamplePDFReport, bytearrayOutputStream.toByteArray());
-////                String whereClause = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + PatientSampleList.get(iPatientSampleIndex) + "'";
-////                long lTemp1 = db.update(esygDbContract.PatientSamplesDB.TABLE_NAME, values1, whereClause, null);
-////                if(lTemp1 <= 0) {
-////                }
-////                db.close();
+    ////                ByteArrayOutputStream bytearrayOutputStream = new ByteArrayOutputStream();
+    ////                document.writeTo(bytearrayOutputStream);
+    ////                esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
+    ////                // Gets the data repository in write mode
+    ////                SQLiteDatabase db = mDbHelper.getWritableDatabase();
+    ////                ContentValues values1 = new ContentValues();
+    ////                values1.put(esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSamplePDFReport, bytearrayOutputStream.toByteArray());
+    ////                String whereClause = esygDbContract.PatientSamplesDB.COLUMN_NAME_PatientSampleList + "=" + "'" + PatientSampleList.get(iPatientSampleIndex) + "'";
+    ////                long lTemp1 = db.update(esygDbContract.PatientSamplesDB.TABLE_NAME, values1, whereClause, null);
+    ////                if(lTemp1 <= 0) {
+    ////                }
+    ////                db.close();
 //            } catch (IOException e) {
 //                throw new RuntimeException(e);
 //            }
@@ -11831,15 +11732,6 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         @Override
         protected Void doInBackground(String... strings) {
             //Wait till background Server-Sync thread is busy
-
-            if(CurrentPatientIndex < 0 ||
-                    CurrentPatientIndex >= alECGScan.size()) {
-
-                Log.e("INDEX_ERROR", "Invalid CurrentPatientIndex = " + CurrentPatientIndex);
-
-                return null;
-            }
-
             while(!SyncServerThreadSleep) {
                 try {
                     Thread.sleep(100);
@@ -11987,8 +11879,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 ReportPatient.TG = "NA";
 //////////////////
             ParseECGReportDB(selectedScan, ReportPatient);
-            // *************** redundant code psy 01/06/2026
-       /*     SelectQRSLead_CalculateHR(selectedScan);
+            SelectQRSLead_CalculateHR(selectedScan);
             HRCopy = Measurement.current_HR;
             lead_no=QRSLeadIndex; //vnp 2 june 16
             if(HRCopy > 0) {
@@ -12002,7 +11893,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             } else {
                 Measure.strInterpretation_Status = "";
             }
-*/
+
             ParseMeasurementReportDB(selectedScan);   //Necessary for prn_current_HR
             try {
                 HRCopy = Short.parseShort(selectedScan.prn_current_HR.trim());
@@ -12040,24 +11931,15 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         }
         @Override
         protected void onPostExecute(Void result) {
-       //     InitViewReport();
-            if(CurrentPatientIndex >= 0 && CurrentPatientIndex < alECGScan.size()) {
-                InitViewReport();
-            } else {
-                Log.e("INDEX_ERROR", "Skipped InitViewReport due to invalid index");
-            }
-
-            RefreshStatus();
+            InitViewReport();
             RefreshStatus();
         }
     }
-
     public void SelectQRSLead_CalculateHR(clsEcgScan ecgScan) {
         System.out.println("QRSLeadIndex = " + String.valueOf(QRSLeadIndex));
         lead_no = QRSLeadIndex; //vnp 15 may 17
-        Measure.Calculate(getBaseContext(), mWriteLeadDataIndex,ecgScan); // Psy 1/06/2026  Measure.Calculate(getBaseContext(), ecgScan);
-
-/*/////////////////////////////////////////////////////
+        Measure.Calculate(getBaseContext(), ecgScan);
+/////////////////////////////////////////////////////
         if(Measurement.current_HR == 0) {
             for(int iLeadCnt = 1; iLeadCnt <= 12; iLeadCnt++) {
 //                public static final String[] LEADS = {"I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"};
@@ -12100,14 +11982,13 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                         lead_no = 6;//"V1"
                         break;
                 }
-
-                Measure.Calculate(getBaseContext(), mWriteLeadDataIndex,ecgScan); // Psy 1/06/2026   Measure.Calculate(getBaseContext(), ecgScan);
+                Measure.Calculate(getBaseContext(), ecgScan);
                 if(Measurement.current_HR > 0) {
                     QRSLeadIndex = lead_no;
                     break;
                 }
             }
-        }*/
+        }
         System.out.println("QRSLeadIndex = " + String.valueOf(QRSLeadIndex));
     }
     private void InitViewReport() {
@@ -12506,7 +12387,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                    A4ReportCode = A4REPORT_SINGLE_PAGE_MEDIANS_WITH_MEASUREMENT_INTERPRETATION;
 
 //                if(A4ReportSubtype.equalsIgnoreCase("ECG Layout 3 By 4"))
-                    A4ReportCode = A4REPORT_SINGLE_PAGE_ECG_LAYOUT_3_BY_4;
+            A4ReportCode = A4REPORT_SINGLE_PAGE_ECG_LAYOUT_3_BY_4;
 //                else if(A4ReportSubtype.equalsIgnoreCase("ECG Layout 6 By 2"))
 //                    A4ReportCode = A4REPORT_SINGLE_PAGE_ECG_LAYOUT_6_BY_2;
 
@@ -12961,7 +12842,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                            A4ReportCode = A4REPORT_SINGLE_PAGE_MEDIANS_WITH_MEASUREMENT_INTERPRETATION;
 
 //                        if(A4ReportSubtype.equalsIgnoreCase("ECG Layout 3 By 4"))
-                            A4ReportCode = A4REPORT_SINGLE_PAGE_ECG_LAYOUT_3_BY_4;
+                    A4ReportCode = A4REPORT_SINGLE_PAGE_ECG_LAYOUT_3_BY_4;
 //                        else if(A4ReportSubtype.equalsIgnoreCase("ECG Layout 6 By 2"))
 //                            A4ReportCode = A4REPORT_SINGLE_PAGE_ECG_LAYOUT_6_BY_2;
 //                    }
@@ -13115,7 +12996,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         tv = (TextView)findViewById(R.id.textViewFirstName);
         tv.setText(ReportPatient.strPatient_Fname);
         if( (ReportPatient.strPatient_Fname.equalsIgnoreCase("Emergency")) ||
-            (ReportPatient.strPatient_Fname.equalsIgnoreCase("Emergency Demo")) ) {
+                (ReportPatient.strPatient_Fname.equalsIgnoreCase("Emergency Demo")) ) {
             tv = (TextView)findViewById(R.id.textViewMiddleName);
             tv.setText("");
             tv = (TextView)findViewById(R.id.textViewLastName);
@@ -13298,7 +13179,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //
 //                tblRow.setOnClickListener(tablerowSamplesOnClickListener);
 //                tblSampleLog.addView(tblRow);
-////            }
+    ////            }
 //        }
 //
 //        tv = (TextView)findViewById(R.id.textViewSampleCount);
@@ -13640,7 +13521,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            tv3.setTextColor(tvRef.getTextColors());
 //            tblRow.addView(tv3);
 //
-////            tblRow.setId(i);
+    ////            tblRow.setId(i);
 //            tblRow.setId(EmergencySampleID.get(i));
 //
 //            tblRow.setOnClickListener(tablerowEmergencyOnClickListener);
@@ -13721,7 +13602,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if( (actionId == EditorInfo.IME_ACTION_DONE) ||
-                    (actionId == EditorInfo.IME_ACTION_NEXT) ){
+                        (actionId == EditorInfo.IME_ACTION_NEXT) ){
                     int iHeight = 30;
                     try {
                         iHeight = Integer.parseInt(v.getText().toString());
@@ -13757,7 +13638,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if( (actionId == EditorInfo.IME_ACTION_DONE) ||
-                    (actionId == EditorInfo.IME_ACTION_NEXT) ){
+                        (actionId == EditorInfo.IME_ACTION_NEXT) ){
                     float flWeight = (float)0.0;
                     try {
                         flWeight = Float.parseFloat(v.getText().toString());
@@ -14200,7 +14081,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             int mYear = c.get(Calendar.YEAR) - 1970;
 
             if( (CurrentLayoutResourceID == R.layout.activity_patient_details) ||
-                (CurrentLayoutResourceID == R.layout.activity_patient_details) ) {
+                    (CurrentLayoutResourceID == R.layout.activity_patient_details) ) {
                 TextView tv = (TextView) findViewById(R.id.editTextAge);
                 tv.setText(String.valueOf(mYear));
             }
@@ -14499,7 +14380,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                         }
                     }
                     if( (CurrentLayoutResourceID == R.layout.activity_patient_details) ||
-                        (CurrentLayoutResourceID == R.layout.activity_patient_identity) ) {
+                            (CurrentLayoutResourceID == R.layout.activity_patient_identity) ) {
                         if( EsyGOnline && PatientListOnline ) {
                             PatientDetailsOnline = true;
 //                            AsyncCallWS_getPatientDetails task2 = new AsyncCallWS_getPatientDetails();
@@ -15602,7 +15483,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 ////bmp 05-Aug-25
 ////                strUrl = "http://" + strServerIP + ":90" + NASAN_I2I_URL_savepatienthistory;
 //                strUrl = "http://" + strServerIP + NASAN_I2I_URL_savepatienthistory;
-////bmp 05-Aug-25
+    ////bmp 05-Aug-25
 //            } else {
 //                strUrl = "https://" + strServerIP + NASAN_I2I_URL_savepatienthistory;
 //            }
@@ -15817,7 +15698,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            OutputStream os = urlConnection.getOutputStream();
 //            byte[] postDataBytes = postDataParams.toString().getBytes("UTF-8");
 //            os.write(postDataBytes);
-////                os.flush();
+    ////                os.flush();
 //            os.close();
 //
 //            int responseCode=urlConnection.getResponseCode();
@@ -16011,7 +15892,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             pb.setVisibility(View.INVISIBLE);
 
         if( (CurrentLayoutResourceID == R.layout.activity_patient_details) ||
-            (CurrentLayoutResourceID == R.layout.activity_patient_details) ) {
+                (CurrentLayoutResourceID == R.layout.activity_patient_details) ) {
             if(UpdatePatientResponseReceived) {
                 Toast.makeText(getBaseContext(), "Patient Details Updated Successfully.", Toast.LENGTH_SHORT).show();
 
@@ -16078,7 +15959,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //
 //        @Override
 //        protected void onProgressUpdate(Void... values) {
-////            Log.i(TAG, "onProgressUpdate");
+    ////            Log.i(TAG, "onProgressUpdate");
 //        }
 //
 //    }
@@ -16089,7 +15970,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            if (DemoMode) {
 //                objPatient.strPatient_Fname = "Emergency Demo";
 //            } else {
-                objPatient.strPatient_Fname = "Emergency";
+            objPatient.strPatient_Fname = "Emergency";
 //            }
             objPatient.strPatient_Mname = "";
             objPatient.strPatient_Lname = "";
@@ -16198,7 +16079,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            OutputStream os = urlConnection.getOutputStream();
 //            byte[] postDataBytes = postDataParams.toString().getBytes("UTF-8");
 //            os.write(postDataBytes);
-////                os.flush();
+    ////                os.flush();
 //            os.close();
 //
 //            String strpostDataParams = postDataParams.toString();
@@ -16444,7 +16325,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //            OutputStream os = urlConnection.getOutputStream();
 //            byte[] postDataBytes = postDataParams.toString().getBytes("UTF-8");
 //            os.write(postDataBytes);
-////                os.flush();
+    ////                os.flush();
 //            os.close();
 //
 //            int responseCode=urlConnection.getResponseCode();
@@ -16979,22 +16860,22 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                             e.printStackTrace();
                         }
 //                        while (BufferInCount > 0) {
-                            try {
-                                mNewDataReceived = true;
-                                ParseUSBData(BufferInByteCount[BufferInReadIndex]);
-                                if (mNewDataCount > 0)
-                                    ProcessDataReceived();
+                        try {
+                            mNewDataReceived = true;
+                            ParseUSBData(BufferInByteCount[BufferInReadIndex]);
+                            if (mNewDataCount > 0)
+                                ProcessDataReceived();
 //bmp 04-Apr-24
 //                                for(int k=0; k<BufferInByteCount[BufferInReadIndex]; k++)
 //                                    BufferIn[BufferInReadIndex][k] = 0;
 //bmp 04-Apr-24
-                                BufferInReadIndex = BufferInReadIndex + 1;
-                                BufferInReadIndex = BufferInReadIndex & BUFFERIN_FOLDBACK;
-                                BufferInCount = BufferInCount - 1;
-                            } catch (Exception e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
+                            BufferInReadIndex = BufferInReadIndex + 1;
+                            BufferInReadIndex = BufferInReadIndex & BUFFERIN_FOLDBACK;
+                            BufferInCount = BufferInCount - 1;
+                        } catch (Exception e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
 //                        }
                         try {
                             glRenderer.SyncObj.release();
@@ -17004,7 +16885,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                         }
                     } else {
                         try {
-    //                        Thread.sleep(10);
+                            //                        Thread.sleep(10);
                             Thread.sleep(4);
                         } catch (InterruptedException e) {
                         }
@@ -17031,10 +16912,10 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                                    StrBufferIn = StrBufferIn + String.format(Locale.getDefault(), "%02X", BufferIn[BufferInWriteIndex][i]);
 //                                System.out.println("StrBufferIn = " + StrBufferIn);
 
-                                BufferInByteCount[BufferInWriteIndex] = result;
-                                BufferInCount = BufferInCount + 1;
-                                BufferInWriteIndex = BufferInWriteIndex + 1;
-                                BufferInWriteIndex = BufferInWriteIndex & BUFFERIN_FOLDBACK;
+                            BufferInByteCount[BufferInWriteIndex] = result;
+                            BufferInCount = BufferInCount + 1;
+                            BufferInWriteIndex = BufferInWriteIndex + 1;
+                            BufferInWriteIndex = BufferInWriteIndex & BUFFERIN_FOLDBACK;
                         } else {
                             System.out.println("FT_PURGE_RX");
                         }
@@ -17553,7 +17434,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         }
     }
 
-        @Override
+    @Override
     protected void onPause() {
         super.onPause();
 
@@ -17698,7 +17579,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     switch(A4ReportCode) {
                         case A4REPORT_SINGLE_PAGE_ECG_LAYOUT_3_BY_4:
                             drawPageEcg_3By4(page, ReportPatient, selectedScan);
-                        break;
+                            break;
                     }
 
                     // Rendering is complete, so page can be finalized.
@@ -17916,67 +17797,31 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 }
             }
 
-           //  psy 01/06/2026 for Gain pluse width 5mm requirement //Gain Pulse = 10mm height = 118.1102362204724  //125px
+            //Gain Pulse = 10mm height = 118.1102362204724  //125px
             float flHeight = 118;
-          /*  canvas.drawLine(115, 750, 125, 750, border_paint);
+            canvas.drawLine(115, 750, 125, 750, border_paint);
             canvas.drawLine(125, 750, 125, (750 - flHeight), border_paint);
             canvas.drawLine(125, (750 - flHeight), 150, (750 - flHeight), border_paint);
             canvas.drawLine(150, (750 - flHeight), 150, 750, border_paint);
-            canvas.drawLine(150, 750, 160, 750, border_paint); */
+            canvas.drawLine(150, 750, 160, 750, border_paint);
 
-            //*******  psy 01/06/2026 for Gain pluse width 5mm requirement to print gain plus at x less than 115 to keep its width 5mm = 60 dots, and not mixing with traces*/
-
-            canvas.drawLine(77, 750, 87, 750, border_paint);
-            canvas.drawLine(87, 750, 87, (750 - flHeight), border_paint);
-            canvas.drawLine(87, (750 - flHeight), 147, (750 - flHeight), border_paint);
-            canvas.drawLine(147, (750 - flHeight), 147, 750, border_paint);
-            canvas.drawLine(147, 750, 157, 750, border_paint);
-            /*************************/
-
-          /*  canvas.drawLine(115, 1200, 125, 1200, border_paint);
+            canvas.drawLine(115, 1200, 125, 1200, border_paint);
             canvas.drawLine(125, 1200, 125, (1200 - flHeight), border_paint);
             canvas.drawLine(125, (1200 - flHeight), 150, (1200 - flHeight), border_paint);
             canvas.drawLine(150, (1200 - flHeight), 150, 1200, border_paint);
-            canvas.drawLine(150, 1200, 160, 1200, border_paint);*/
+            canvas.drawLine(150, 1200, 160, 1200, border_paint);
 
-            /*************************/
-            //*****  psy 01/06/2026 for Gain pluse width 5mm requirement
-            canvas.drawLine(77, 1200, 87, 1200, border_paint);
-            canvas.drawLine(87, 1200, 87, (1200 - flHeight), border_paint);
-            canvas.drawLine(87, (1200 - flHeight), 147, (1200 - flHeight), border_paint);
-            canvas.drawLine(147, (1200 - flHeight), 147, 1200, border_paint);
-            canvas.drawLine(147, 1200, 157, 1200, border_paint);
-            /*************************/
-
-            /*canvas.drawLine(115, 1650, 125, 1650, border_paint);
+            canvas.drawLine(115, 1650, 125, 1650, border_paint);
             canvas.drawLine(125, 1650, 125, (1650 - flHeight), border_paint);
             canvas.drawLine(125, (1650 - flHeight), 150, (1650 - flHeight), border_paint);
             canvas.drawLine(150, (1650 - flHeight), 150, 1650, border_paint);
-            canvas.drawLine(150, 1650, 160, 1650, border_paint);*/
+            canvas.drawLine(150, 1650, 160, 1650, border_paint);
 
-            /*************************/
-            //  psy 01/06/2026 for Gain pluse width 5mm requirement
-            canvas.drawLine(77, 1650, 87, 1650, border_paint);
-            canvas.drawLine(87, 1650, 87, (1650 - flHeight), border_paint);
-            canvas.drawLine(87, (1650 - flHeight), 147, (1650 - flHeight), border_paint);
-            canvas.drawLine(147, (1650 - flHeight), 147, 1650, border_paint);
-            canvas.drawLine(147, 1650, 157, 1650, border_paint);
-            /*************************/
-
-           /* canvas.drawLine(115, 2100, 125, 2100, border_paint);
+            canvas.drawLine(115, 2100, 125, 2100, border_paint);
             canvas.drawLine(125, 2100, 125, (2100 - flHeight), border_paint);
             canvas.drawLine(125, (2100 - flHeight), 150, (2100 - flHeight), border_paint);
             canvas.drawLine(150, (2100 - flHeight), 150, 2100, border_paint);
-            canvas.drawLine(150, 2100, 160, 2100, border_paint);*/
-
-            /*************************/
-            //  psy 01/06/2026 for Gain pluse width 5mm requirement
-            canvas.drawLine(77, 2100, 87, 2100, border_paint);
-            canvas.drawLine(87, 2100, 87, (2100 - flHeight), border_paint);
-            canvas.drawLine(87, (2100 - flHeight), 147, (2100 - flHeight), border_paint);
-            canvas.drawLine(147, (2100 - flHeight), 147, 2100, border_paint);
-            canvas.drawLine(147, 2100, 157, 2100, border_paint);
-            /*************************/
+            canvas.drawLine(150, 2100, 160, 2100, border_paint);
 
             short LeadIndex;
             int iTemp1, PrevX, PrevY;
@@ -18550,30 +18395,30 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 
             //Measurement
             canvas.drawText(String.format("%s%s%s",
-                    PR_INTERVAL,
-                    String.format("%3s", ecgScan.prn_nInterval[QRSLeadIndex][1]),
-                    " ms"),
+                            PR_INTERVAL,
+                            String.format("%3s", ecgScan.prn_nInterval[QRSLeadIndex][1]),
+                            " ms"),
                     100, 425, text_paint);
             canvas.drawText(String.format("%s%s%s",
-                    QTc,
-                    String.format("%4s", ecgScan.prn_nInterval[QRSLeadIndex][3]),
-                    " ms"),
+                            QTc,
+                            String.format("%4s", ecgScan.prn_nInterval[QRSLeadIndex][3]),
+                            " ms"),
                     500, 425, text_paint);
 
             canvas.drawText(String.format("%s%s%s",
-                    QRS_DURATION,
-                    String.format("%3s", ecgScan.prn_nInterval[QRSLeadIndex][2]),
-                    " ms"),
+                            QRS_DURATION,
+                            String.format("%3s", ecgScan.prn_nInterval[QRSLeadIndex][2]),
+                            " ms"),
                     100, 475, text_paint);
 
             canvas.drawText(String.format("%s%s%s%s%s%s%s",
-                    P_QRS_T_AXIS_1,
-                    String.format("%4s", ecgScan.prn_nAxis[0]),
-                    ")-(",
-                    String.format("%4s", ecgScan.prn_nAxis[1]),
-                    ")-(",
-                    String.format("%4s", ecgScan.prn_nAxis[2]),
-                    ") deg"),
+                            P_QRS_T_AXIS_1,
+                            String.format("%4s", ecgScan.prn_nAxis[0]),
+                            ")-(",
+                            String.format("%4s", ecgScan.prn_nAxis[1]),
+                            ")-(",
+                            String.format("%4s", ecgScan.prn_nAxis[2]),
+                            ") deg"),
                     500, 475, text_paint);
 
             canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
@@ -18594,89 +18439,89 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             int xTemp = 1170;
             if(!rptPatient.Weight.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "Weight:",
-                        String.format("%4s", rptPatient.Weight),
-                        " Kg"),
+                                "Weight:",
+                                String.format("%4s", rptPatient.Weight),
+                                " Kg"),
                         xTemp, 575, text_paint);    //1170
                 xTemp += 285;
             }
             if(!rptPatient.Height.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "Height:",
-                        String.format("%3s", rptPatient.Height),
-                        " cm"),
+                                "Height:",
+                                String.format("%3s", rptPatient.Height),
+                                " cm"),
                         xTemp, 575, text_paint);     //1455
                 xTemp += 285;
             }
             if(!rptPatient.BMI.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "BMI:",
-                        String.format("%4s", rptPatient.BMI),
-                        " "),
+                                "BMI:",
+                                String.format("%4s", rptPatient.BMI),
+                                " "),
                         xTemp, 575, text_paint);     //1740
                 xTemp += 190;
             }
             if( (!rptPatient.Systolic.equalsIgnoreCase("NA")) && (!rptPatient.Diastolic.equalsIgnoreCase("NA")) ) {
                 canvas.drawText(String.format("%s%s%s",
-                        "BP:",
-                        String.format("%7s", (rptPatient.Systolic + "/" + rptPatient.Diastolic)),
-                        " "),
+                                "BP:",
+                                String.format("%7s", (rptPatient.Systolic + "/" + rptPatient.Diastolic)),
+                                " "),
                         xTemp, 575, text_paint);    //1930
                 xTemp += 230;
             }
             if(!rptPatient.Hb.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "Hb:",
-                        String.format("%4s", rptPatient.Hb),
-                        " "),
+                                "Hb:",
+                                String.format("%4s", rptPatient.Hb),
+                                " "),
                         xTemp, 575, text_paint);     //2160
                 xTemp += 170;
             }
             if(!rptPatient.HbA1c.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "HbA1c:",
-                        String.format("%3s", rptPatient.HbA1c),
-                        " "),
+                                "HbA1c:",
+                                String.format("%3s", rptPatient.HbA1c),
+                                " "),
                         xTemp, 575, text_paint);     //2330
                 xTemp += 220;
             }
             if(!rptPatient.RBS.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "RBS:",
-                        String.format("%3s", rptPatient.RBS),
-                        " "),
+                                "RBS:",
+                                String.format("%3s", rptPatient.RBS),
+                                " "),
                         xTemp, 575, text_paint);     //2550
                 xTemp += 170;
             }
             if(!rptPatient.TC.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "TC:",
-                        String.format("%3s", rptPatient.TC),
-                        " "),
+                                "TC:",
+                                String.format("%3s", rptPatient.TC),
+                                " "),
                         xTemp, 575, text_paint);     //2720
                 xTemp += 160;
             }
             if(!rptPatient.LDL.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "LDL:",
-                        String.format("%3s", rptPatient.LDL),
-                        " "),
+                                "LDL:",
+                                String.format("%3s", rptPatient.LDL),
+                                " "),
                         xTemp, 575, text_paint);     //2880
                 xTemp += 175;
             }
             if(!rptPatient.HDL.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "HDL:",
-                        String.format("%3s", rptPatient.HDL),
-                        " "),
+                                "HDL:",
+                                String.format("%3s", rptPatient.HDL),
+                                " "),
                         xTemp, 575, text_paint);     //3055
                 xTemp += 175;
             }
             if(!rptPatient.TG.equalsIgnoreCase("NA")) {
                 canvas.drawText(String.format("%s%s%s",
-                        "TG:",
-                        String.format("%3s", rptPatient.TG),
-                        " "),
+                                "TG:",
+                                String.format("%3s", rptPatient.TG),
+                                " "),
                         xTemp, 575, text_paint);     //3230
                 xTemp += 175;
             }
@@ -18837,61 +18682,29 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 
             //Gain Pulse = 10mm height = 118.1102362204724  //125px
             float flHeight = 118;
-            /*            canvas.drawLine(115, 750, 125, 750, border_paint);
+            canvas.drawLine(115, 750, 125, 750, border_paint);
             canvas.drawLine(125, 750, 125, (750 - flHeight), border_paint);
             canvas.drawLine(125, (750 - flHeight), 150, (750 - flHeight), border_paint);
             canvas.drawLine(150, (750 - flHeight), 150, 750, border_paint);
             canvas.drawLine(150, 750, 160, 750, border_paint);
-*/
-            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
-            canvas.drawLine(77, 750, 87, 750, border_paint);
-            canvas.drawLine(87, 750, 87, (750 - flHeight), border_paint);
-            canvas.drawLine(87, (750 - flHeight), 147, (750 - flHeight), border_paint);
-            canvas.drawLine(147, (750 - flHeight), 147, 750, border_paint);
-            canvas.drawLine(147, 750, 157, 750, border_paint);
-            /***********/
 
-          /*            canvas.drawLine(115, 1200, 125, 1200, border_paint);
+            canvas.drawLine(115, 1200, 125, 1200, border_paint);
             canvas.drawLine(125, 1200, 125, (1200 - flHeight), border_paint);
             canvas.drawLine(125, (1200 - flHeight), 150, (1200 - flHeight), border_paint);
             canvas.drawLine(150, (1200 - flHeight), 150, 1200, border_paint);
             canvas.drawLine(150, 1200, 160, 1200, border_paint);
-*/
-            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
-            canvas.drawLine(77, 1200, 87, 1200, border_paint);
-            canvas.drawLine(87, 1200, 87, (1200 - flHeight), border_paint);
-            canvas.drawLine(87, (1200 - flHeight), 147, (1200 - flHeight), border_paint);
-            canvas.drawLine(147, (1200 - flHeight), 147, 1200, border_paint);
-            canvas.drawLine(147, 1200, 157, 1200, border_paint);
-            /***********/
 
-          /*           canvas.drawLine(115, 1650, 125, 1650, border_paint);
+            canvas.drawLine(115, 1650, 125, 1650, border_paint);
             canvas.drawLine(125, 1650, 125, (1650 - flHeight), border_paint);
             canvas.drawLine(125, (1650 - flHeight), 150, (1650 - flHeight), border_paint);
             canvas.drawLine(150, (1650 - flHeight), 150, 1650, border_paint);
             canvas.drawLine(150, 1650, 160, 1650, border_paint);
-*/
-            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
-            canvas.drawLine(77, 1650, 87, 1650, border_paint);
-            canvas.drawLine(87, 1650, 87, (1650 - flHeight), border_paint);
-            canvas.drawLine(87, (1650 - flHeight), 147, (1650 - flHeight), border_paint);
-            canvas.drawLine(147, (1650 - flHeight), 147, 1650, border_paint);
-            canvas.drawLine(147, 1650, 157, 1650, border_paint);
-            /***********/
- /*
+
             canvas.drawLine(115, 2100, 125, 2100, border_paint);
             canvas.drawLine(125, 2100, 125, (2100 - flHeight), border_paint);
             canvas.drawLine(125, (2100 - flHeight), 150, (2100 - flHeight), border_paint);
             canvas.drawLine(150, (2100 - flHeight), 150, 2100, border_paint);
             canvas.drawLine(150, 2100, 160, 2100, border_paint);
-*/
-            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
-            canvas.drawLine(77, 2100, 87, 2100, border_paint);
-            canvas.drawLine(87, 2100, 87, (2100 - flHeight), border_paint);
-            canvas.drawLine(87, (2100 - flHeight), 147, (2100 - flHeight), border_paint);
-            canvas.drawLine(147, (2100 - flHeight), 147, 2100, border_paint);
-            canvas.drawLine(147, 2100, 157, 2100, border_paint);
-            /***********/
 
             short LeadIndex;
             int iTemp1, PrevX, PrevY;
@@ -19382,7 +19195,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             text_paint.setTextSize(40);
 
 //            canvas.drawText(String.format("%s", strInstitutionAddress), 1950, 350, text_paint);
-           /* String strInstAddr = "";
+            String strInstAddr = "";
             try {
                 JSONObject jObj = new JSONObject(strInstitutionAddress);
 //    \"InstitutionAddress\":{\"address1\":\"Pune\",
@@ -19400,42 +19213,6 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 strInstAddr = strInstAddr + " " + jObj.getString("pincode");
             } catch (JSONException e) {
                 throw new RuntimeException(e);
-            }*/
-            String strInstAddr = "";
-
-            try {
-
-                if (strInstitutionAddress != null &&
-                        !strInstitutionAddress.trim().isEmpty()) {
-
-                    JSONObject jObj = new JSONObject(strInstitutionAddress);
-
-                    strInstAddr = strInstAddr + jObj.optString("address1", "");
-
-                    String city = jObj.optString("city", "");
-                    String pincode = jObj.optString("pincode", "");
-
-                    strInstAddr = strInstAddr + " " + city;
-                    strInstAddr = strInstAddr + " " + pincode;
-
-                    if (strInstAddr.length() > 50) {
-                        strInstAddr = strInstAddr.substring(0, 50);
-                    }
-
-                } else {
-
-                    Log.e("JSON_ERROR", "strInstitutionAddress is empty or null");
-
-                    strInstAddr = "";
-
-                }
-
-            } catch (Exception e) {
-
-                Log.e("JSON_ERROR", "Invalid JSON : " + strInstitutionAddress, e);
-
-                strInstAddr = "";
-
             }
 
             canvas.drawText(String.format("%s", strInstAddr), 1350, 350, text_paint);
@@ -19506,11 +19283,8 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                             ") deg"),
                     500, 475, text_paint);
 
-          // psy 01/06/2026  canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
-            canvas.drawText(String.format("%s", "Patient History: ",rptPatient.HistoryText), 1170, 425, text_paint);
-
+            canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
             if(!rptPatient.strHistoryConditions.isEmpty()) {
-
                 if(rptPatient.strHistoryConditions.length() > 100) {
                     canvas.drawText(String.format("%s", rptPatient.strHistoryConditions.substring(0, 100)), 1170, (425 + 50), text_paint);
                     canvas.drawText(String.format("%s", rptPatient.strHistoryConditions.substring(100)), 1170, (425 + 100), text_paint);
