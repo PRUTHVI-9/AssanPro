@@ -1,0 +1,1133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/configLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context="com.example.AsaanPro_V1.MainActivity">
+    <!--android:theme="@android:style/Theme.NoTitleBar.Fullscreen"-->
+
+    <RelativeLayout
+        android:id="@+id/LinearLayoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:isScrollContainer="false" >
+
+        <Button
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="Cancel"
+            android:id="@+id/buttonConfigCancel"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textStyle="bold"
+            android:onClick="onClickConfig" />
+
+<!--        <CheckBox-->
+<!--            android:id="@+id/checkBoxDemo"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_marginLeft="50dp"-->
+<!--            android:layout_toRightOf="@+id/buttonConfigCancel"-->
+<!--            android:checked="false"-->
+<!--            android:onClick="onClickConfig"-->
+<!--            android:text="Demo"-->
+<!--            android:textSize="@dimen/TAB_G_TextSizeLarge"-->
+<!--            android:textStyle="bold" />-->
+
+<!--        <TextView-->
+<!--            android:id="@+id/textViewHeader"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_centerInParent="true"-->
+<!--            android:text="Configuration"-->
+<!--            android:textAppearance="?android:attr/textAppearanceLarge"-->
+<!--            android:textSize="@dimen/TAB_G_TextSizeLarge" />-->
+
+        <CheckBox
+            android:id="@+id/checkBoxPreviewBeforeSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@+id/buttonConfigCancel"
+            android:layout_centerVertical="true"
+            android:onClick="onClickConfig"
+            android:text="Preview-Send"
+            android:textSize="@dimen/TAB_G_TextSizeLarge"
+            android:textStyle="bold" />
+        <!--        android:layout_centerInParent="true"-->
+
+        <CheckBox
+            android:id="@+id/checkBoxPrintBeforeSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:onClick="onClickConfig"
+            android:text="Print-Send"
+            android:textSize="@dimen/TAB_G_TextSizeLarge"
+            android:textStyle="bold" />
+
+        <CheckBox
+            android:id="@+id/checkBoxShortDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:layout_toLeftOf="@+id/buttonConfigOK"
+            android:onClick="onClickConfig"
+            android:text="Short Details"
+            android:textSize="@dimen/TAB_G_TextSizeLarge"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/buttonConfigOK"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:layout_alignParentRight="false"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/imageViewCommStatus"
+            android:onClick="onClickConfig"
+            android:text="OK"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/imageViewCommStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:src="@android:drawable/presence_online" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/LinearLayoutHeader"
+        android:scrollbarStyle="outsideOverlay"
+        android:scrollbars="vertical|horizontal" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical" >
+
+<!--            <LinearLayout-->
+<!--            android:orientation="vertical"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="10dp">-->
+
+<!--            <TextView-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:textAppearance="?android:attr/textAppearanceMedium"-->
+<!--            android:text="Thermal Print Settings"-->
+<!--            android:id="@+id/textView4"-->
+<!--            android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--            android:textColor="@color/cyan" />-->
+
+<!--            <LinearLayout-->
+<!--            android:orientation="horizontal"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_marginTop="5dp">-->
+
+<!--            <LinearLayout-->
+<!--            android:orientation="vertical"-->
+<!--            android:layout_width="fill_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1">-->
+
+<!--                <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textAppearance="?android:attr/textAppearanceMedium"-->
+<!--                android:text="Print Gain (cm/mv)"-->
+<!--                android:id="@+id/textViewPrintGain"-->
+<!--                android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                android:textColor="@color/magenta" />-->
+
+<!--                <RadioGroup-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:id="@+id/rgPrintGain">-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="0.5"-->
+<!--                    android:id="@+id/rbPrintGainHalf"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="1"-->
+<!--                    android:id="@+id/rbPrintGainOne"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="2"-->
+<!--                    android:id="@+id/rbPrintGainTwo"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+<!--                </RadioGroup>-->
+
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--            android:orientation="vertical"-->
+<!--            android:layout_width="fill_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_marginLeft="20dp"-->
+<!--            android:layout_weight="1">-->
+
+<!--                <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textAppearance="?android:attr/textAppearanceMedium"-->
+<!--                android:text="Print Length (Sec)"-->
+<!--                android:id="@+id/textViewThPrintLength"-->
+<!--                android:textColor="@color/magenta"-->
+<!--                android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+
+<!--                <RadioGroup-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:id="@+id/rgPrintLength">-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="2"-->
+<!--                    android:id="@+id/rbPrintLength2Sec"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="3"-->
+<!--                    android:id="@+id/rbPrintLength3Sec"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="4"-->
+<!--                    android:id="@+id/rbPrintLength4Sec"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+<!--                </RadioGroup>-->
+
+<!--            </LinearLayout>-->
+
+<!--            <LinearLayout-->
+<!--            android:orientation="vertical"-->
+<!--            android:layout_width="fill_parent"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_marginLeft="20dp"-->
+<!--            android:layout_weight="0.7"-->
+<!--                android:visibility="invisible">-->
+
+<!--                <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:textAppearance="?android:attr/textAppearanceMedium"-->
+<!--                android:text="Print Format"-->
+<!--                android:id="@+id/textViewThPrintFormat"-->
+<!--                android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                android:textColor="@color/magenta" />-->
+
+<!--                <RadioGroup-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:orientation="horizontal"-->
+<!--                android:id="@+id/rgPrintFormat">-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Single Channel"-->
+<!--                    android:id="@+id/rbPrintFormat1Channel"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+
+<!--                    <RadioButton-->
+<!--                    android:layout_width="fill_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Three Channel"-->
+<!--                    android:id="@+id/rbPrintFormat3Channel"-->
+<!--                    android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+<!--                    android:layout_weight="1" />-->
+<!--                </RadioGroup>-->
+
+<!--            </LinearLayout>-->
+<!--            </LinearLayout>-->
+
+<!--                &lt;!&ndash;<TextView&ndash;&gt;-->
+<!--                &lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:textAppearance="?android:attr/textAppearanceMedium"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:text="Report Format"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:id="@+id/textView28"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:textColor="@color/magenta"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium" />&ndash;&gt;-->
+
+<!--                &lt;!&ndash;<LinearLayout&ndash;&gt;-->
+<!--                &lt;!&ndash;android:orientation="horizontal"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+<!--                &lt;!&ndash;android:layout_height="wrap_content">&ndash;&gt;-->
+
+<!--                    &lt;!&ndash;<RadioGroup&ndash;&gt;-->
+<!--                    &lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+<!--                    &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                    &lt;!&ndash;android:orientation="horizontal"&ndash;&gt;-->
+<!--                    &lt;!&ndash;android:id="@+id/rgThReportType">&ndash;&gt;-->
+
+<!--                        &lt;!&ndash;<RadioButton&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_width="fill_parent"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:text="Resting ECG"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:id="@+id/rbThMode1"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_weight="1.1"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_gravity="center_vertical" />&ndash;&gt;-->
+
+<!--                        &lt;!&ndash;<RadioButton&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_width="fill_parent"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:text="ECG with Measurement"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:id="@+id/rbThMode2"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_weight="1" />&ndash;&gt;-->
+
+<!--                        &lt;!&ndash;<RadioButton&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_width="fill_parent"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:text="ECG with Interpretation"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:id="@+id/rbThMode3"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_weight="1" />&ndash;&gt;-->
+
+<!--                        &lt;!&ndash;<RadioButton&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_width="fill_parent"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:text="ECG with Measurement and Interpretation"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:id="@+id/rbThMode4"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_weight="0.9"&ndash;&gt;-->
+<!--                        &lt;!&ndash;android:layout_marginBottom="10dp" />&ndash;&gt;-->
+<!--                    &lt;!&ndash;</RadioGroup>&ndash;&gt;-->
+
+<!--                &lt;!&ndash;</LinearLayout>&ndash;&gt;-->
+<!--            </LinearLayout>-->
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="A4 Print Settings"
+                    android:id="@+id/textView36"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium"
+                    android:textColor="@color/cyan" />
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <RadioGroup
+                        android:id="@+id/rgA4ReportSubtype"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rb34"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:onClick="onClickConfig"
+                            android:text="ECG Layout 3 By 4"
+                            android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        <RadioButton
+                            android:id="@+id/rb62"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:enabled="false"
+                            android:onClick="onClickConfig"
+                            android:text="ECG Layout 6 By 2"
+                            android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+                <!--<LinearLayout-->
+                    <!--android:orientation="horizontal"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content">-->
+
+                    <!--<RadioGroup-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:orientation="horizontal"-->
+                        <!--android:id="@+id/rgA4ReportType">-->
+
+                        <!--<RadioButton-->
+                            <!--android:layout_width="fill_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="Single Page Report"-->
+                            <!--android:id="@+id/rbA4SinglePage"-->
+                            <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                            <!--android:layout_weight="1"-->
+                            <!--android:onClick="onClickConfig" />-->
+
+                        <!--<RadioButton-->
+                            <!--android:layout_width="fill_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="Two Page Report"-->
+                            <!--android:id="@+id/rbA4TwoPage"-->
+                            <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                            <!--android:layout_weight="1.5"-->
+                            <!--android:onClick="onClickConfig" />-->
+                    <!--</RadioGroup>-->
+
+                <!--</LinearLayout>-->
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:orientation="horizontal" >-->
+
+                    <!--<RadioGroup-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_marginLeft="50dp"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:id="@+id/rgA4Report1Subtype">-->
+
+                        <!--&lt;!&ndash;<RadioButton&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:text="ECG Only"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:id="@+id/rb10"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium" />&ndash;&gt;-->
+                        <!--<RadioButton-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="ECG Layout 3 By 4"-->
+                            <!--android:id="@+id/rb10"-->
+                            <!--android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+
+                        <!--&lt;!&ndash;<RadioButton&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:text="ECG with Interpretation"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:id="@+id/rb11"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium" />&ndash;&gt;-->
+
+                        <!--&lt;!&ndash;<RadioButton&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:text="Medians with Measurement"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:id="@+id/rb12"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium" />&ndash;&gt;-->
+
+                        <!--&lt;!&ndash;<RadioButton&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_width="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:text="Medians with Measurement and Interpretation"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:id="@+id/rb13"&ndash;&gt;-->
+                            <!--&lt;!&ndash;android:textSize="@dimen/TAB_G_TextSizeMedium" />&ndash;&gt;-->
+                    <!--</RadioGroup>-->
+
+                    <!--<RadioGroup-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_marginLeft="50dp"-->
+                        <!--android:layout_weight="1.5"-->
+                        <!--android:id="@+id/rgA4Report2Subtype">-->
+
+                        <!--<RadioButton-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="Without Interpretation"-->
+                            <!--android:id="@+id/rb20"-->
+                            <!--android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+
+                        <!--<RadioButton-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:text="With Interpretation"-->
+                            <!--android:id="@+id/rb21"-->
+                            <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                            <!--android:checked="false" />-->
+                    <!--</RadioGroup>-->
+                <!--</LinearLayout>-->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal" >
+
+                    <RadioGroup
+                        android:id="@+id/radioGroupGrid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_weight="0.5"
+                        android:dividerPadding="@dimen/activity_horizontal_margin"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/radio0"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="No Grid"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        <RadioButton
+                            android:id="@+id/radio1"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginLeft="2dp"
+                            android:text="Grid"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                        <RadioButton
+                            android:id="@+id/radio2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginLeft="2dp"
+                            android:text="Graph"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    </RadioGroup>
+
+                    <CheckBox
+                        android:id="@+id/checkBox4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:maxLines="1"
+                        android:minLines="1"
+                        android:text="Color"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="0.5" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox8"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Borders"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="0.5" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:text="Heart Rate"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="0.5" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <!--<LinearLayout-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="60dp"-->
+                <!--android:orientation="horizontal" >-->
+
+                <!--<CheckBox-->
+                    <!--android:id="@+id/checkBox1"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:minLines="2"-->
+                    <!--android:text="All Lead Measurement"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+                    <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                    <!--android:layout_weight="0.6" />-->
+
+                <!--<CheckBox-->
+                    <!--android:id="@+id/checkBox2"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:text="Resting ECG"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+                    <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_weight="0.5"-->
+                    <!--android:checked="true"-->
+                    <!--android:visibility="invisible" />-->
+
+            <!--</LinearLayout>-->
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="90dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:id="@+id/TextViewLongLead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Long Lead"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <Spinner
+                        android:id="@+id/spinnerLongLead"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:entries="@array/Leads"
+                        android:gravity="left|center_vertical"
+                        android:layout_weight="1" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:id="@+id/TextViewGain"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Display Gain"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <Spinner
+                        android:id="@+id/SpinnerGain"
+                        android:layout_width="fill_parent"
+                        android:layout_height="fill_parent"
+                        android:entries="@array/GainValues"
+                        android:gravity="left|center_vertical" />
+                </LinearLayout>
+
+                <!--<LinearLayout-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_weight="0.3"-->
+                    <!--android:layout_marginLeft="10dp">-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                        <!--android:text="Thermal Print Gain (cm/mv)"-->
+                        <!--android:id="@+id/textViewPrintGain"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+
+                    <!--<Spinner-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="fill_parent"-->
+                        <!--android:id="@+id/SpinnerPrintGain"-->
+                        <!--android:entries="@array/PrintGainValues"-->
+                        <!--android:gravity="center_vertical|left" />-->
+                <!--</LinearLayout>-->
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="90dp">
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/textViewHospitalName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minEms="6"
+                        android:text="Reporting Center"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/EditTextReportingCenter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:digits="@string/alpha_small_cap_numeric_keys"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="text"
+                        android:maxLength="50"
+                        android:minEms="10"
+                        android:nextFocusForward="@id/configLayout"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/textViewOriginatingCenter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:minEms="6"
+                        android:text="Originating Center"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:id="@+id/EditTextOriginatingCenter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:digits="@string/alpha_small_cap_numeric_keys"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="text"
+                        android:maxLength="50"
+                        android:minEms="10"
+                        android:nextFocusForward="@id/configLayout"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+                </LinearLayout>
+
+                <!--<LinearLayout-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="3">-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                        <!--android:text="Username"-->
+                        <!--android:id="@+id/textView36"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+
+                    <!--<EditText-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:id="@+id/EditTextUsername"-->
+                        <!--android:maxLength="20"-->
+                        <!--android:imeOptions="actionDone"-->
+                        <!--android:nextFocusForward="@id/configLayout"-->
+                        <!--android:layout_weight="1"-->
+                    <!--android:digits="@string/alpha_numeric_hiphen_keys" />-->
+                <!--</LinearLayout>-->
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Printer Email"
+                        android:id="@+id/textViewPrinterEmailAddress"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:ems="10"
+                        android:id="@+id/EditTextPrinterEmailAddress"
+                        android:singleLine="true"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:nextFocusForward="@id/configLayout"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:digits="@string/alpha_numeric_hiphen_keys" />
+                </LinearLayout>
+
+                <!--<LinearLayout-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1.2"-->
+                    <!--android:layout_marginLeft="10dp">-->
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/textViewServerIP"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                        <!--android:text="Server IP"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium" />-->
+
+                    <!--<EditText-->
+                        <!--android:id="@+id/EditTextServerIP"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:ems="10"-->
+                        <!--android:gravity="center_vertical|left"-->
+                        <!--android:imeOptions="actionDone"-->
+                        <!--android:inputType="phone"-->
+                        <!--android:maxLength="15"-->
+                        <!--android:minEms="10"-->
+                        <!--android:nextFocusForward="@+id/configLayout"-->
+                        <!--android:enabled="true"-->
+                        <!--android:digits="@string/ipnumeric_keys" />-->
+
+                <!--</LinearLayout>-->
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/TextViewSendTo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:minEms="6"
+                        android:text="Send To Email ID :"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:visibility="visible" />
+
+                    <EditText
+                        android:id="@+id/EditTextSendTo"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:digits="@string/alpha_numeric_hiphen_keys"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="100"
+                        android:minEms="10"
+                        android:nextFocusForward="@id/configLayout"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:visibility="visible" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.3"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:text="Emergencies"
+                        android:id="@+id/textView22" />
+
+                    <Spinner
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spinnerPendingEmergencyLimit"
+                        android:entries="@array/PendingEmergencyLimit"
+                        android:gravity="left|center_vertical" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.3"
+                    android:layout_marginLeft="10dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:text="Sleep (min)"
+                        android:id="@+id/textView20" />
+
+                    <Spinner
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/spinnerSleepTimeout"
+                        android:entries="@array/SleepTimeoutValues"
+                        android:gravity="left|center_vertical" />
+                </LinearLayout>
+
+                <!--<LinearLayout-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1.3">-->
+
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                        <!--android:text="Auto Refer"-->
+                        <!--android:id="@+id/textView2"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                        <!--android:layout_gravity="center_horizontal" />-->
+
+                    <!--<CheckBox-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:id="@+id/checkBoxAutoRefer"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                        <!--android:layout_gravity="center_horizontal" />-->
+                <!--</LinearLayout>-->
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <!--<LinearLayout-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:orientation="vertical">-->
+
+                    <!--<TextView-->
+                        <!--android:id="@+id/TextViewSendTo"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:minEms="6"-->
+                        <!--android:text="Send To Email ID :"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                        <!--android:visibility="visible" />-->
+
+                    <!--<EditText-->
+                        <!--android:id="@+id/EditTextSendTo"-->
+                        <!--android:layout_width="fill_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:digits="@string/alpha_numeric_hiphen_keys"-->
+                        <!--android:ems="10"-->
+                        <!--android:gravity="center_vertical|left"-->
+                        <!--android:imeOptions="actionDone"-->
+                        <!--android:inputType="textEmailAddress"-->
+                        <!--android:maxLength="100"-->
+                        <!--android:minEms="10"-->
+                        <!--android:nextFocusForward="@id/configLayout"-->
+                        <!--android:textSize="@dimen/TAB_G_TextSizeMedium"-->
+                        <!--android:visibility="visible" />-->
+
+                <!--</LinearLayout>-->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2">
+
+                    <TextView
+                        android:id="@+id/textViewServerAddress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:text="Server Address"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+<!--                    <EditText-->
+<!--                        android:id="@+id/EditTextServerIP"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:ems="10"-->
+<!--                        android:gravity="center_vertical|left"-->
+<!--                        android:imeOptions="actionDone|flagNoExtractUi"-->
+<!--                        android:inputType="phone"-->
+<!--                        android:maxLength="15"-->
+<!--                        android:minEms="10"-->
+<!--                        android:nextFocusForward="@+id/configLayout"-->
+<!--                        android:enabled="true"-->
+<!--                        android:digits="@string/ipnumeric_keys" />-->
+
+                    <EditText
+                        android:id="@+id/EditTextServerAddress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="100"
+                        android:minEms="10"
+                        android:nextFocusForward="@+id/configLayout"
+                        android:enabled="true"
+                        android:digits="@string/alpha_numeric_hiphen_keys" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/textViewSenderGmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:minEms="6"
+                        android:text="Sender Gmail ID :"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:visibility="invisible" />
+
+                    <EditText
+                        android:id="@+id/EditTextSenderGmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="100"
+                        android:minEms="10"
+                        android:nextFocusForward="@id/configLayout"
+                        android:visibility="invisible"
+                        android:digits="@string/alpha_numeric_hiphen_keys" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.2"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/TextViewPassword"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:minEms="6"
+                        android:text="Password :"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:visibility="invisible" />
+
+                    <EditText
+                        android:id="@+id/EditTextPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="textPassword"
+                        android:maxLength="100"
+                        android:minEms="10"
+                        android:nextFocusForward="@id/configLayout"
+                        android:visibility="invisible"
+                        android:digits="@string/alpha_numeric_hiphen_keys" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <LinearLayout
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/TextViewEmailSubject"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:minEms="6"
+                        android:text="Email Subject :"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textSize="@dimen/TAB_G_TextSizeMedium"
+                        android:visibility="invisible" />
+
+                    <EditText
+                        android:id="@+id/EditTextEmailSubject"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:ems="10"
+                        android:gravity="center_vertical|left"
+                        android:imeOptions="actionDone|flagNoExtractUi"
+                        android:inputType="textEmailSubject"
+                        android:maxLength="100"
+                        android:minEms="10"
+                        android:nextFocusForward="@id/configLayout"
+                        android:visibility="invisible"
+                        android:digits="@string/alpha_numeric_hiphen_keys" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>

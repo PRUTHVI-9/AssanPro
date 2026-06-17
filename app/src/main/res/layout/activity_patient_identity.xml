@@ -1,0 +1,367 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.AsaanPro_V1.MainActivity">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayoutSearch">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.9">
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Mobile : "
+                    android:id="@+id/textViewMobileNumber"
+                    android:layout_toRightOf="@+id/editTextPatientID"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium"
+                    android:minEms="4" />
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:id="@+id/editTextMobileNumber"
+                    android:layout_below="@+id/textViewMobileNumber"
+                    android:layout_alignLeft="@+id/textViewMobileNumber"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium"
+                    android:imeOptions="actionDone|flagNoExtractUi"
+                    android:numeric="integer"
+                    android:singleLine="true"
+                    android:maxLength="15"
+                    android:digits="@string/numeric_keys" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Birthdate : "
+                    android:id="@+id/textViewDOBLabel"
+                    android:layout_toRightOf="@+id/editTextMobileNumber"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:id="@+id/textViewDOB"
+                    android:layout_below="@+id/textViewDOBLabel"
+                    android:layout_alignLeft="@+id/textViewDOBLabel"
+                    android:textSize="@dimen/TAB_G_TextSizeLarge"
+                    android:background="@color/white"
+                    android:textColor="@color/black"
+                    android:gravity="left"
+                    android:imeOptions="actionDone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Firstname : "
+                android:id="@+id/textViewFirstName"
+                android:layout_toRightOf="@+id/editTextDOB"
+                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+            <EditText
+                android:id="@+id/editTextFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textViewFirstName"
+                android:layout_alignLeft="@+id/textViewFirstName"
+                android:layout_marginTop="10dp"
+                android:digits="@string/alphabet_keys"
+                android:imeOptions="actionDone|flagNoExtractUi"
+                android:inputType="textPersonName"
+                android:maxLength="35"
+                android:singleLine="true"
+                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Middlename : "
+                android:id="@+id/textViewMiddleName"
+                android:layout_toRightOf="@+id/editTextFirstName"
+                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:id="@+id/editTextMiddleName"
+                android:layout_below="@+id/textViewMiddleName"
+                android:layout_alignLeft="@+id/textViewMiddleName"
+                android:textSize="@dimen/TAB_G_TextSizeMedium"
+                android:imeOptions="actionDone|flagNoExtractUi"
+                android:singleLine="true"
+                android:maxLength="35"
+                android:layout_marginTop="10dp"
+                android:digits="@string/alphabet_keys" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginLeft="5dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="Lastname : "
+                android:id="@+id/textViewLastName"
+                android:layout_toRightOf="@+id/editTextMiddleName"
+                android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:id="@+id/editTextLastName"
+                android:layout_below="@+id/textViewLastName"
+                android:layout_alignLeft="@+id/textViewLastName"
+                android:layout_toLeftOf="@+id/buttonSearch"
+                android:textSize="@dimen/TAB_G_TextSizeMedium"
+                android:imeOptions="actionDone|flagNoExtractUi"
+                android:singleLine="true"
+                android:maxLength="35"
+                android:layout_marginTop="10dp"
+                android:digits="@string/alphabet_keys" />
+        </LinearLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="Search"
+            android:id="@+id/buttonSearch"
+            android:layout_alignParentTop="true"
+            android:onClick="onClickPatientIdentity"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textStyle="bold"
+            android:layout_toLeftOf="@+id/buttonClose"
+            android:layout_alignBottom="@+id/editTextPatientID" />
+
+        <ImageView
+            android:id="@+id/imageViewCommStatus"
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
+            android:layout_weight="1.2"
+            android:src="@android:drawable/presence_online" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Matching Records : "
+        android:id="@+id/textViewMatchingList"
+        android:layout_below="@+id/linearLayoutSearch"
+        android:textSize="@dimen/TAB_G_TextSizeLarge"
+        android:textStyle="bold"
+        android:layout_marginTop="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/textViewRecords"
+        android:layout_marginLeft="5dp"
+        android:layout_below="@+id/linearLayoutSearch"
+        android:layout_toRightOf="@+id/textViewMatchingList"
+        android:textStyle="bold"
+        android:textSize="@dimen/TAB_G_TextSizeLarge"
+        android:textColor="@color/cyan"
+        android:text="0"
+        android:layout_alignBottom="@+id/textViewMatchingList"
+        android:gravity="bottom" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressBarPatientIdentity"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"
+        android:indeterminate="true" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollViewSearchResults"
+        android:layout_below="@+id/textViewMatchingList"
+        android:layout_above="@+id/linearLayoutControl"
+        android:layout_marginTop="5dp">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:showDividers="beginning|middle|end"
+            android:layout_above="@+id/linearLayoutControl"
+            android:layout_below="@+id/textViewMatchingList"
+            android:id="@+id/tableLayoutSearchResults"
+            android:divider="@color/black"
+            android:layout_margin="2dp"
+            android:stretchColumns="*">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="left"
+                android:layout_margin="2dip"
+                android:background="@color/black"
+                android:id="@+id/trSearchResultsHeader">
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Mobile Number"
+                    android:id="@+id/tvMobileNumber"
+                    android:layout_weight="1"
+                    android:textColor="@color/cyan"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Date Of Birth"
+                    android:id="@+id/tvDOB"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium"
+                    android:textColor="@color/cyan" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="First Name"
+                    android:id="@+id/tvFirstName"
+                    android:layout_weight="1"
+                    android:textColor="@color/cyan"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Middle Name"
+                    android:id="@+id/tvMiddleName"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium"
+                    android:textColor="@color/cyan" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="Last Name"
+                    android:id="@+id/tvLastName"
+                    android:layout_weight="1"
+                    android:textStyle="bold"
+                    android:textColor="@color/cyan"
+                    android:textSize="@dimen/TAB_G_TextSizeMedium" />
+
+            </TableRow>
+
+        </TableLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayoutControl">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:id="@+id/buttonCancel"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:onClick="onClickPatientIdentity"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textStyle="bold"
+            android:layout_alignBottom="@+id/editTextPatientID"
+            android:layout_weight="1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Register New"
+            android:id="@+id/buttonRegisterNew"
+            android:layout_weight="1"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textStyle="bold"
+            android:onClick="onClickPatientIdentity"
+            android:enabled="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select"
+            android:id="@+id/buttonSelect"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:onClick="onClickPatientIdentity"
+            android:layout_weight="1"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textStyle="bold"
+            android:enabled="false" />
+
+    </LinearLayout>
+
+</RelativeLayout>

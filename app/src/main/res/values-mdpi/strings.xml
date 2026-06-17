@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    <string name="app_name">Esy-G</string>-->
+    <color name="green">#00FF00</color>
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <!--    <string name="app_folder">Esy-G</string>-->
+    <color name="red">#ff0000</color>
+
+    <color name="yellow">#FFFF00</color>
+    <color name="cyan">#00ffff</color>
+    <color name="blue">#0000FF</color>
+    <!--<string name="alphabet_keys">abcdefghijklmnopqrstuvwxyz </string>-->
+    <color name="grey">#C0C0C0</color>
+    <color name="magenta">#ff00ff</color>
+    <string name="app_name">AsaanPro</string>
+    <string name="app_version">Version 1.0</string>
+    <string name="app_v">V1.0</string>
+
+    <string name="app_folder">asaan</string>
+    <string name="numeric_keys">0123456789</string>
+    <string name="ipnumeric_keys">0123456789.</string>
+    <string name="telenumeric_keys">0123456789+</string>
+    <string name="alphabet_keys">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
+    <string name="alpha_numeric_keys">abcdefghijklmnopqrstuvwxyz 0123456789</string>
+    <string name="alpha_small_cap_numeric_keys">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
+    <string name="alpha_numeric_hiphen_keys">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789~!@#$%^*()-_=+[{]}\|;:\'",./?</string>
+    <string name="history_condition_keys">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ,()</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="choice_array">
+        <item>Select Action</item>
+        <item>Upload</item>
+        <item>Download</item>
+        <item>Print</item>
+        <item>Remove</item>
+    </string-array>
+
+    <string-array name="Leads">
+        <item>I</item>
+        <item>II</item>
+        <item>III</item>
+        <item>aVR</item>
+        <item>aVL</item>
+        <item>aVF</item>
+        <item>V1</item>
+        <item>V2</item>
+        <item>V3</item>
+        <item>V4</item>
+        <item>V5</item>
+        <item>V6</item>
+    </string-array>
+
+    <string-array name="GainValues">
+        <item>0.5</item>
+        <item>1.0</item>
+        <item>2.0</item>
+    </string-array>
+
+    <string-array name="PrintGainValues">
+        <item>0.5</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string-array name="SleepTimeoutValues">
+        <item>2</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string-array name="PendingEmergencyLimit">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>

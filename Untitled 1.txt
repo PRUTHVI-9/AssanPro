@@ -1,0 +1,6 @@
+﻿{
+  "Response" : "Error: System.NullReferenceException: Object reference not set to an instance of an object.\r\n   at ConnectWebApi.DAL.ConnectECG.ECGRepository.LinkEmergency(PatientSearchQuery query) in C:\\Venu_Data\\Dev\\Projects\\connectuploader\\UploadConnect\\ConnectWebApi\\ConnectWebApi.DAL\\ConnectECG\\ECGRepository.cs:line 672\r\n   at ConnectWebApi.ECG.ECGController.LinkEmergency(PatientSearchQuery patient) in C:\\Venu_Data\\Dev\\Projects\\connectuploader\\UploadConnect\\ConnectWebApi\\ConnectWebApi\\ECG\\ECGController.cs:line 1500",
+  "IsSuccess" : false,
+  "UserID" : 0
+}
+

@@ -1,0 +1,171 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.AsaanPro_V1.MainActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout0"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/linearLayout1">
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/linearLayout0"
+        android:layout_toRightOf="@+id/linearLayout1"
+        android:layout_above="@+id/linearLayout6"
+        android:layout_toLeftOf="@+id/linearLayout5">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/linearLayout2"
+            android:layout_toRightOf="@+id/linearLayout1"
+            android:layout_below="@+id/linearLayout0"
+            android:layout_above="@+id/linearLayout6"
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="Patient"
+                android:id="@+id/buttonNew"
+                android:textSize="@dimen/TAB_G_TextSizeExtraLarge"
+                android:layout_alignParentLeft="true"
+                android:layout_above="@+id/buttonEmergency"
+                android:layout_weight="1"
+                android:onClick="onClickMain"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="Emergency"
+                android:id="@+id/buttonEmergency"
+                android:layout_above="@+id/buttonSettings"
+                android:layout_alignParentLeft="true"
+                android:textSize="@dimen/TAB_G_TextSizeExtraLarge"
+                android:layout_weight="1"
+                android:onClick="onClickMain"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/linearLayout4"
+            android:layout_below="@+id/linearLayout0"
+            android:layout_above="@+id/linearLayout6"
+            android:layout_toRightOf="@+id/linearLayout2"
+            android:layout_weight="1">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="Review Tests"
+                android:id="@+id/buttonReview"
+                android:layout_above="@+id/buttonEditTrauma"
+                android:textSize="@dimen/TAB_G_TextSizeExtraLarge"
+                android:layout_alignParentRight="true"
+                android:layout_weight="1"
+                android:onClick="onClickMain"
+                android:textStyle="bold" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:text="Configuration"
+                android:id="@+id/buttonSettings"
+                android:textSize="@dimen/TAB_G_TextSizeExtraLarge"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_weight="1"
+                android:onClick="onClickMain"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:id="@+id/linearLayout5"
+        android:gravity="right">
+
+        <ImageView
+            android:id="@+id/imageViewCommStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/presence_offline" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBarMain"
+            android:layout_centerInParent="true"
+            android:visibility="invisible"
+            android:indeterminate="true" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/linearLayout6"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/textViewStatus"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:layout_below="@+id/textViewVersion"
+            android:layout_weight="1"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:textColor="@color/green"
+            android:layout_marginRight="10dp"
+            android:gravity="right"
+            android:text="000000000000-0.0" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="@string/app_version"
+            android:id="@+id/textViewVersion"
+            android:textColor="@color/green"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/textViewTitle"
+            android:textSize="@dimen/TAB_G_TextSizeMedium"
+            android:layout_weight="1"
+            android:layout_marginLeft="10dp" />
+    </LinearLayout>
+
+</RelativeLayout>
