@@ -61,6 +61,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -405,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String SPEED_MEDIUM = "25.0mm/sec";
     public static final String SPEED_HIGH = "50.0mm/sec";
 
-    public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.0";     //15-Jan-2024
+    public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.1";   // psy 01/06/2026 public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.0";     //15-Jan-2024
 
 //    public static final String DISCLAIMER 			= "*Unconfirmed Reporting, Unless Referred to Clinician.";
 //    public static final float DISCLAIMER_X 			= 150;
@@ -5198,13 +5199,23 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
     calSet.set(Calendar.MONTH, monthOfYear);
     calSet.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
+        if(Emergency) {
+            rptPatient.PatientAge = "";
+        } else {
     Calendar calNow = Calendar.getInstance();
+
     int iYear = calNow.get(Calendar.YEAR);
+
     int iAge = iYear - year;
+
     if (calNow.get(Calendar.DAY_OF_YEAR) < calSet.get(Calendar.DAY_OF_YEAR)) {
         iAge--;
     }
+
     rptPatient.PatientAge = String.valueOf(iAge);
+        }
+
+       /* rptPatient.PatientAge = "--";*/
 
     rptPatient.strPatient_Fname = strComments[iCommentsIndex++].trim();
     rptPatient.strPatient_Mname = strComments[iCommentsIndex++].trim();
@@ -5236,10 +5247,19 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
     strInterpretation = Measure.strInterpretation_Status;
 
     //To avoid uninitialized strPatient_Gender in case of old .cmt file
-    rptPatient.strPatient_Gender = "Male";
     strTemp = strComments[iCommentsIndex++];
-    if(strTemp != null) {
+
+        if(Emergency) {
+
+            rptPatient.strPatient_Gender = "";
+
+        } else {
+
+            if(strTemp != null && !strTemp.trim().isEmpty()) {
         rptPatient.strPatient_Gender = strTemp.trim();
+            } else {
+                rptPatient.strPatient_Gender = "";
+            }
     }
 
     //To avoid uninitialized strVar in case of old .cmt file
@@ -6083,7 +6103,8 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
                                 RendererSyncObjReleased = true;
 
                                 lead_no = QRSLeadIndex; //vnp 15 may 17
-                                Measure.Calculate(getBaseContext(), acqScan);
+                                SelectQRSLead_CalculateHR(acqScan); // redundant code psy 01/06/2026Measure.Calculate(getBaseContext(), acqScan);
+
                                 acqScan.HRCopy = Measurement.current_HR;
                                 lead_no = QRSLeadIndex; //vnp 2 june 16
                                 if (acqScan.HRCopy > 0) {
@@ -6267,6 +6288,8 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 
         ParseECGReportDB(acqScan, currentPatient);
 
+//***************  reduntant code  psy 01/06/2026
+/*
         SelectQRSLead_CalculateHR(acqScan);
 
         HRCopy = Measurement.current_HR;
@@ -6286,6 +6309,7 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
         } else {
             Measure.strInterpretation_Status = "";
         }
+*/
 
         ParseMeasurementReportDB(acqScan);   //Necessary for prn_current_HR
 
@@ -6664,7 +6688,7 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
 //        }
 //        byte[] bytearrayMeasurementData = new byte[7225];
         byte[] bytearrayMeasurementData = new byte[11614];
-        if(ecgScan.Emergency) {
+        if(Emergency) { // psy 01/06/2026 if(ecgScan.Emergency) {
             esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
             // Gets the data repository in write mode
             SQLiteDatabase db = mDbHelper.getReadableDatabase();
@@ -9461,18 +9485,71 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 textView.setTextSize(30);
                 break;
             case R.id.buttonEmailReport:
-                PrevLayoutResourceID = R.layout.activity_sample_status;
-//                String StrPDFReportPreview = baseDir + "/data/" + "Preview" + ".pdf";
-                String StrPDFReportPreview = getBaseContext().getCacheDir() + File.separator + "Preview" + ".pdf";
-                File pdfFile = new File(StrPDFReportPreview);
-                if (pdfFile.exists()) {
-                    mLastFileName = alECGScan.get(CurrentPatientIndex).strScan;
-//                    String StrPDFReportFileName = baseDir + "/data/" + mLastFileName + ".pdf";
-                    String StrPDFReportFileName = getBaseContext().getCacheDir() + File.separator + mLastFileName + ".pdf";
-                    File rptFile = new File(StrPDFReportFileName);
-                    pdfFile.renameTo(rptFile);
 
-                    strEmailAttachment = StrPDFReportFileName;
+                PrevLayoutResourceID = R.layout.activity_sample_status;
+
+                String StrPDFReportPreview =
+                        getBaseContext().getCacheDir()
+                                + File.separator
+                                + "Preview.pdf";
+
+                File previewFile = new File(StrPDFReportPreview);
+
+                Log.e("PDF_PATH", previewFile.getAbsolutePath());
+
+                if (previewFile.exists() && previewFile.length() > 0) {
+
+                    // Timestamp filename
+                    mLastFileName = alECGScan.get(CurrentPatientIndex).strScan;
+
+                    File newPdfFile = new File(
+                            getBaseContext().getCacheDir(),
+                            mLastFileName + ".pdf"
+                    );
+
+                    try {
+
+                        FileInputStream fis = new FileInputStream(previewFile);
+
+                        FileOutputStream fos = new FileOutputStream(newPdfFile);
+
+                        byte[] buffer = new byte[4096];
+
+                        int bytesRead;
+
+                        while ((bytesRead = fis.read(buffer)) != -1) {
+
+                            fos.write(buffer, 0, bytesRead);
+
+                        }
+
+                        fos.flush();
+
+                        fos.getFD().sync();
+
+                        fis.close();
+
+                        fos.close();
+
+                        Log.e("PDF_COPY", "Copy Success");
+
+                    } catch (Exception e) {
+
+                        Log.e("PDF_COPY", "Copy Failed", e);
+
+                    }
+
+                    // Attach timestamp PDF
+                    strEmailAttachment = newPdfFile.getAbsolutePath();
+
+                    File finalFile = new File(strEmailAttachment);
+
+                    Log.e("PDF_ATTACH", strEmailAttachment);
+
+                    Log.e("PDF_SIZE", String.valueOf(finalFile.length()));
+
+                    if (finalFile.exists() && finalFile.length() > 0) {
+
                     EmailReport();
 
                     dlgState = ESY_G_DIALOG_STATE_PRINT_SUCCESS;
@@ -9481,40 +9558,83 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     dialog.show();
                     textView = (TextView) dialog.findViewById(android.R.id.message);
                     textView.setTextSize(30);
+                    } else {
+
+                        Log.e("PDF_ERROR", "Final PDF corrupted");
+
                 }
+
+                } else {
+
+                    Log.e("PDF_ERROR", "Preview PDF missing or empty");
+
+                    dlgAlert.setMessage("PDF not generated properly.");
+
+                    dialog = dlgAlert.create();
+
+                    dialog.show();
+
+                }
+
                 break;
         }
     }
 
     public void EmailReport() {
-        Intent sendIntent;
-        sendIntent = new Intent(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "");
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "");
+
+        try {
+
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
+
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "ECG Report");
+
+            sendIntent.putExtra(Intent.EXTRA_TEXT, "Please find attached ECG report.");
+
         sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {strDrEmailAddress});
+
         sendIntent.putExtra(Intent.EXTRA_CC, new String[] {ReportPatient.strPatient_Mailid});
 
         File pdfFile = new File(strEmailAttachment);
-        if(pdfFile.exists()) {
-            Toast.makeText(getBaseContext(), strEmailAttachment, Toast.LENGTH_SHORT).show();
-        } else {
-            String Str1 = "pdfFile.exists false: " + strEmailAttachment;
-            Toast.makeText(getBaseContext(), Str1, Toast.LENGTH_SHORT).show();
-            sendIntent.putExtra(Intent.EXTRA_TEXT, Str1);
+
+            Log.e("EMAIL_FILE", pdfFile.getAbsolutePath());
+
+            Log.e("EMAIL_FILE", "Exists = " + pdfFile.exists());
+
+            Log.e("EMAIL_FILE", "Size = " + pdfFile.length());
+
+            if (!pdfFile.exists() || pdfFile.length() <= 0) {
+
+                Toast.makeText(getBaseContext(), "PDF file missing or empty", Toast.LENGTH_LONG).show();
+
+                return;
         }
 
-        pdfFile.setReadable(true, false);
-//        Uri senduri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName() + ".provider", pdfFile);
-        Uri senduri = FileProvider.getUriForFile(getBaseContext(), getBaseContext().getPackageName() + ".provider", pdfFile);
-        sendIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            Uri senduri = FileProvider.getUriForFile(
+                    getApplicationContext(),
+                    getApplicationContext().getPackageName() + ".provider",
+                    pdfFile
+            );
+
         sendIntent.putExtra(Intent.EXTRA_STREAM, senduri);
 
-        sendIntent.setType("message/rfc822");
+            // IMPORTANT
+            sendIntent.setType("application/pdf");
+
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // Gmail only
         sendIntent.setPackage("com.google.android.gm");
-//        sendIntent.setType("application/pdf");
 
         dlgState = ESY_G_DIALOG_STATE_NOT_FOREGROUND;
-        startActivityIntent.launch(sendIntent);
+
+            startActivity(sendIntent);
+
+        } catch (Exception e) {
+
+            Log.e("EMAIL_ERROR", "Email failed", e);
+
+            Toast.makeText(getBaseContext(), "Gmail not installed or Email failed", Toast.LENGTH_LONG).show();
+    }
     }
 
     ActivityResultLauncher<Intent> startActivityIntent = registerForActivityResult(
@@ -11773,6 +11893,15 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         @Override
         protected Void doInBackground(String... strings) {
             //Wait till background Server-Sync thread is busy
+
+            if(CurrentPatientIndex < 0 ||
+                    CurrentPatientIndex >= alECGScan.size()) {
+
+                Log.e("INDEX_ERROR", "Invalid CurrentPatientIndex = " + CurrentPatientIndex);
+
+                return null;
+            }
+
             while(!SyncServerThreadSleep) {
                 try {
                     Thread.sleep(100);
@@ -11920,7 +12049,8 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 ReportPatient.TG = "NA";
 //////////////////
             ParseECGReportDB(selectedScan, ReportPatient);
-            SelectQRSLead_CalculateHR(selectedScan);
+            // *************** redundant code psy 01/06/2026
+       /*     SelectQRSLead_CalculateHR(selectedScan);
             HRCopy = Measurement.current_HR;
             lead_no=QRSLeadIndex; //vnp 2 june 16
             if(HRCopy > 0) {
@@ -11934,7 +12064,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             } else {
                 Measure.strInterpretation_Status = "";
             }
-
+*/
             ParseMeasurementReportDB(selectedScan);   //Necessary for prn_current_HR
             try {
                 HRCopy = Short.parseShort(selectedScan.prn_current_HR.trim());
@@ -11972,15 +12102,22 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         }
         @Override
         protected void onPostExecute(Void result) {
+            //     InitViewReport();
+            if(CurrentPatientIndex >= 0 && CurrentPatientIndex < alECGScan.size()) {
             InitViewReport();
+            } else {
+                Log.e("INDEX_ERROR", "Skipped InitViewReport due to invalid index");
+            }
             RefreshStatus();
         }
     }
+
     public void SelectQRSLead_CalculateHR(clsEcgScan ecgScan) {
         System.out.println("QRSLeadIndex = " + String.valueOf(QRSLeadIndex));
         lead_no = QRSLeadIndex; //vnp 15 may 17
-        Measure.Calculate(getBaseContext(), ecgScan);
-/////////////////////////////////////////////////////
+        Measure.Calculate(getBaseContext(), mWriteLeadDataIndex,ecgScan); // Psy 1/06/2026  Measure.Calculate(getBaseContext(), ecgScan);
+
+/*/////////////////////////////////////////////////////
         if(Measurement.current_HR == 0) {
             for(int iLeadCnt = 1; iLeadCnt <= 12; iLeadCnt++) {
 //                public static final String[] LEADS = {"I", "II", "III", "aVR", "aVL", "aVF", "V1", "V2", "V3", "V4", "V5", "V6"};
@@ -12023,13 +12160,14 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                         lead_no = 6;//"V1"
                         break;
                 }
-                Measure.Calculate(getBaseContext(), ecgScan);
+
+                Measure.Calculate(getBaseContext(), mWriteLeadDataIndex,ecgScan); // Psy 1/06/2026   Measure.Calculate(getBaseContext(), ecgScan);
                 if(Measurement.current_HR > 0) {
                     QRSLeadIndex = lead_no;
                     break;
                 }
             }
-        }
+        }*/
         System.out.println("QRSLeadIndex = " + String.valueOf(QRSLeadIndex));
     }
     private void InitViewReport() {
@@ -17838,31 +17976,67 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 }
             }
 
-            //Gain Pulse = 10mm height = 118.1102362204724  //125px
+            //  psy 01/06/2026 for Gain pluse width 5mm requirement //Gain Pulse = 10mm height = 118.1102362204724  //125px
             float flHeight = 118;
-            canvas.drawLine(115, 750, 125, 750, border_paint);
+          /*  canvas.drawLine(115, 750, 125, 750, border_paint);
             canvas.drawLine(125, 750, 125, (750 - flHeight), border_paint);
             canvas.drawLine(125, (750 - flHeight), 150, (750 - flHeight), border_paint);
             canvas.drawLine(150, (750 - flHeight), 150, 750, border_paint);
-            canvas.drawLine(150, 750, 160, 750, border_paint);
+            canvas.drawLine(150, 750, 160, 750, border_paint); */
 
-            canvas.drawLine(115, 1200, 125, 1200, border_paint);
+            //*******  psy 01/06/2026 for Gain pluse width 5mm requirement to print gain plus at x less than 115 to keep its width 5mm = 60 dots, and not mixing with traces*/
+
+            canvas.drawLine(77, 750, 87, 750, border_paint);
+            canvas.drawLine(87, 750, 87, (750 - flHeight), border_paint);
+            canvas.drawLine(87, (750 - flHeight), 147, (750 - flHeight), border_paint);
+            canvas.drawLine(147, (750 - flHeight), 147, 750, border_paint);
+            canvas.drawLine(147, 750, 157, 750, border_paint);
+            /*************************/
+
+          /*  canvas.drawLine(115, 1200, 125, 1200, border_paint);
             canvas.drawLine(125, 1200, 125, (1200 - flHeight), border_paint);
             canvas.drawLine(125, (1200 - flHeight), 150, (1200 - flHeight), border_paint);
             canvas.drawLine(150, (1200 - flHeight), 150, 1200, border_paint);
-            canvas.drawLine(150, 1200, 160, 1200, border_paint);
+            canvas.drawLine(150, 1200, 160, 1200, border_paint);*/
 
-            canvas.drawLine(115, 1650, 125, 1650, border_paint);
+            /*************************/
+            //*****  psy 01/06/2026 for Gain pluse width 5mm requirement
+            canvas.drawLine(77, 1200, 87, 1200, border_paint);
+            canvas.drawLine(87, 1200, 87, (1200 - flHeight), border_paint);
+            canvas.drawLine(87, (1200 - flHeight), 147, (1200 - flHeight), border_paint);
+            canvas.drawLine(147, (1200 - flHeight), 147, 1200, border_paint);
+            canvas.drawLine(147, 1200, 157, 1200, border_paint);
+            /*************************/
+
+            /*canvas.drawLine(115, 1650, 125, 1650, border_paint);
             canvas.drawLine(125, 1650, 125, (1650 - flHeight), border_paint);
             canvas.drawLine(125, (1650 - flHeight), 150, (1650 - flHeight), border_paint);
             canvas.drawLine(150, (1650 - flHeight), 150, 1650, border_paint);
-            canvas.drawLine(150, 1650, 160, 1650, border_paint);
+            canvas.drawLine(150, 1650, 160, 1650, border_paint);*/
 
-            canvas.drawLine(115, 2100, 125, 2100, border_paint);
+            /*************************/
+            //  psy 01/06/2026 for Gain pluse width 5mm requirement
+            canvas.drawLine(77, 1650, 87, 1650, border_paint);
+            canvas.drawLine(87, 1650, 87, (1650 - flHeight), border_paint);
+            canvas.drawLine(87, (1650 - flHeight), 147, (1650 - flHeight), border_paint);
+            canvas.drawLine(147, (1650 - flHeight), 147, 1650, border_paint);
+            canvas.drawLine(147, 1650, 157, 1650, border_paint);
+            /*************************/
+
+           /* canvas.drawLine(115, 2100, 125, 2100, border_paint);
             canvas.drawLine(125, 2100, 125, (2100 - flHeight), border_paint);
             canvas.drawLine(125, (2100 - flHeight), 150, (2100 - flHeight), border_paint);
             canvas.drawLine(150, (2100 - flHeight), 150, 2100, border_paint);
-            canvas.drawLine(150, 2100, 160, 2100, border_paint);
+            canvas.drawLine(150, 2100, 160, 2100, border_paint);*/
+
+            /*************************/
+            //  psy 01/06/2026 for Gain pluse width 5mm requirement
+            canvas.drawLine(77, 2100, 87, 2100, border_paint);
+            canvas.drawLine(87, 2100, 87, (2100 - flHeight), border_paint);
+            canvas.drawLine(87, (2100 - flHeight), 147, (2100 - flHeight), border_paint);
+            canvas.drawLine(147, (2100 - flHeight), 147, 2100, border_paint);
+            canvas.drawLine(147, 2100, 157, 2100, border_paint);
+            /*************************/
 
             short LeadIndex;
             int iTemp1, PrevX, PrevY;
@@ -18723,29 +18897,61 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 
             //Gain Pulse = 10mm height = 118.1102362204724  //125px
             float flHeight = 118;
-            canvas.drawLine(115, 750, 125, 750, border_paint);
+            /*            canvas.drawLine(115, 750, 125, 750, border_paint);
             canvas.drawLine(125, 750, 125, (750 - flHeight), border_paint);
             canvas.drawLine(125, (750 - flHeight), 150, (750 - flHeight), border_paint);
             canvas.drawLine(150, (750 - flHeight), 150, 750, border_paint);
             canvas.drawLine(150, 750, 160, 750, border_paint);
+*/
+            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
+            canvas.drawLine(77, 750, 87, 750, border_paint);
+            canvas.drawLine(87, 750, 87, (750 - flHeight), border_paint);
+            canvas.drawLine(87, (750 - flHeight), 147, (750 - flHeight), border_paint);
+            canvas.drawLine(147, (750 - flHeight), 147, 750, border_paint);
+            canvas.drawLine(147, 750, 157, 750, border_paint);
+            /***********/
 
-            canvas.drawLine(115, 1200, 125, 1200, border_paint);
+          /*            canvas.drawLine(115, 1200, 125, 1200, border_paint);
             canvas.drawLine(125, 1200, 125, (1200 - flHeight), border_paint);
             canvas.drawLine(125, (1200 - flHeight), 150, (1200 - flHeight), border_paint);
             canvas.drawLine(150, (1200 - flHeight), 150, 1200, border_paint);
             canvas.drawLine(150, 1200, 160, 1200, border_paint);
+*/
+            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
+            canvas.drawLine(77, 1200, 87, 1200, border_paint);
+            canvas.drawLine(87, 1200, 87, (1200 - flHeight), border_paint);
+            canvas.drawLine(87, (1200 - flHeight), 147, (1200 - flHeight), border_paint);
+            canvas.drawLine(147, (1200 - flHeight), 147, 1200, border_paint);
+            canvas.drawLine(147, 1200, 157, 1200, border_paint);
+            /***********/
 
-            canvas.drawLine(115, 1650, 125, 1650, border_paint);
+          /*           canvas.drawLine(115, 1650, 125, 1650, border_paint);
             canvas.drawLine(125, 1650, 125, (1650 - flHeight), border_paint);
             canvas.drawLine(125, (1650 - flHeight), 150, (1650 - flHeight), border_paint);
             canvas.drawLine(150, (1650 - flHeight), 150, 1650, border_paint);
             canvas.drawLine(150, 1650, 160, 1650, border_paint);
-
+*/
+            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
+            canvas.drawLine(77, 1650, 87, 1650, border_paint);
+            canvas.drawLine(87, 1650, 87, (1650 - flHeight), border_paint);
+            canvas.drawLine(87, (1650 - flHeight), 147, (1650 - flHeight), border_paint);
+            canvas.drawLine(147, (1650 - flHeight), 147, 1650, border_paint);
+            canvas.drawLine(147, 1650, 157, 1650, border_paint);
+            /***********/
+ /*
             canvas.drawLine(115, 2100, 125, 2100, border_paint);
             canvas.drawLine(125, 2100, 125, (2100 - flHeight), border_paint);
             canvas.drawLine(125, (2100 - flHeight), 150, (2100 - flHeight), border_paint);
             canvas.drawLine(150, (2100 - flHeight), 150, 2100, border_paint);
             canvas.drawLine(150, 2100, 160, 2100, border_paint);
+*/
+            //psy 01-06-26 for Gain Pulse width 5 mm requirement/***********/
+            canvas.drawLine(77, 2100, 87, 2100, border_paint);
+            canvas.drawLine(87, 2100, 87, (2100 - flHeight), border_paint);
+            canvas.drawLine(87, (2100 - flHeight), 147, (2100 - flHeight), border_paint);
+            canvas.drawLine(147, (2100 - flHeight), 147, 2100, border_paint);
+            canvas.drawLine(147, 2100, 157, 2100, border_paint);
+            /***********/
 
             short LeadIndex;
             int iTemp1, PrevX, PrevY;
@@ -19236,7 +19442,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             text_paint.setTextSize(40);
 
 //            canvas.drawText(String.format("%s", strInstitutionAddress), 1950, 350, text_paint);
-            String strInstAddr = "";
+           /* String strInstAddr = "";
             try {
                 JSONObject jObj = new JSONObject(strInstitutionAddress);
 //    \"InstitutionAddress\":{\"address1\":\"Pune\",
@@ -19254,6 +19460,42 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 strInstAddr = strInstAddr + " " + jObj.getString("pincode");
             } catch (JSONException e) {
                 throw new RuntimeException(e);
+            }*/
+            String strInstAddr = "";
+
+            try {
+
+                if (strInstitutionAddress != null &&
+                        !strInstitutionAddress.trim().isEmpty()) {
+
+                    JSONObject jObj = new JSONObject(strInstitutionAddress);
+
+                    strInstAddr = strInstAddr + jObj.optString("address1", "");
+
+                    String city = jObj.optString("city", "");
+                    String pincode = jObj.optString("pincode", "");
+
+                    strInstAddr = strInstAddr + " " + city;
+                    strInstAddr = strInstAddr + " " + pincode;
+
+                    if (strInstAddr.length() > 50) {
+                        strInstAddr = strInstAddr.substring(0, 50);
+                    }
+
+                } else {
+
+                    Log.e("JSON_ERROR", "strInstitutionAddress is empty or null");
+
+                    strInstAddr = "";
+
+                }
+
+            } catch (Exception e) {
+
+                Log.e("JSON_ERROR", "Invalid JSON : " + strInstitutionAddress, e);
+
+                strInstAddr = "";
+
             }
 
             canvas.drawText(String.format("%s", strInstAddr), 1350, 350, text_paint);
@@ -19324,7 +19566,9 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                             ") deg"),
                     500, 475, text_paint);
 
-            canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
+            // psy 01/06/2026  canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
+            canvas.drawText(String.format("%s", "Patient History: ",rptPatient.HistoryText), 1170, 425, text_paint);
+
             if(!rptPatient.strHistoryConditions.isEmpty()) {
                 if(rptPatient.strHistoryConditions.length() > 100) {
                     canvas.drawText(String.format("%s", rptPatient.strHistoryConditions.substring(0, 100)), 1170, (425 + 50), text_paint);

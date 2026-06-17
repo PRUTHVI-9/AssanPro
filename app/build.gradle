@@ -1,11 +1,13 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdk 31
+    compileSdk 33
     defaultConfig {
         applicationId 'com.example.AsaanPro_V1'
         minSdk 24
-        targetSdk 31
+        targetSdk 33
         versionCode 1
         versionName '1.0'
     }
@@ -26,14 +28,15 @@ dependencies {
    /* implementation files('/home/bhalchandra/AndroidStudioProjects/AsaanPro_V1/app/libs/commons-net-3.3.jar')
     implementation files('libs/commons-net-3.3.jar')*/
     implementation 'commons-net:commons-net:3.9.0'
+    // Firebase BOM
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
 
+    // Firebase Analytics
+    implementation 'com.google.firebase:firebase-analytics'
+
+    // Firebase Crashlytics
+    implementation 'com.google.firebase:firebase-crashlytics'
 }
-
-/*dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-
-}*/
 
 
 
