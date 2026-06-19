@@ -18658,7 +18658,9 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     ") deg"),
                     500, 475, text_paint);
 
-            canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
+           // canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
+            canvas.drawText("Patient History: " + rptPatient.HistoryText, 1170, 425, text_paint);
+
             if(!rptPatient.strHistoryConditions.isEmpty()) {
                 if(rptPatient.strHistoryConditions.length() > 100) {
                     canvas.drawText(String.format("%s", rptPatient.strHistoryConditions.substring(0, 100)), 1170, (425 + 50), text_paint);
@@ -19589,8 +19591,8 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     500, 475, text_paint);
 
             // psy 01/06/2026  canvas.drawText(String.format("%s", "Patient History: "), 1170, 425, text_paint);
-            canvas.drawText(String.format("%s", "Patient History: ",rptPatient.HistoryText), 1170, 425, text_paint);
-
+         //   canvas.drawText(String.format("%s", "Patient History: ",rptPatient.HistoryText), 1170, 425, text_paint);
+            canvas.drawText("Patient History: " + rptPatient.HistoryText, 1170, 425, text_paint);
             if(!rptPatient.strHistoryConditions.isEmpty()) {
                 if(rptPatient.strHistoryConditions.length() > 100) {
                     canvas.drawText(String.format("%s", rptPatient.strHistoryConditions.substring(0, 100)), 1170, (425 + 50), text_paint);
