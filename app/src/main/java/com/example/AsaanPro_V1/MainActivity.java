@@ -1360,7 +1360,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            byte[] myBufferIn = new byte[10];
+           // byte[] myBufferIn = new byte[10];
+            byte[] myBufferIn = new byte[64];
             result = mUsbDeviceConnection.bulkTransfer(endpointDataIn, myBufferIn, myBufferIn.length, 0);
             if (result >= 9) {
                 //https://www.ftdichip.com/Support/Knowledgebase/index.html?an232b_04smalldataend.htm
@@ -3448,31 +3449,39 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                                     try {
                                         Calendar cDOB = Calendar.getInstance();
-                                        cDOB.set(Integer.parseInt(OnlinePatient.strPatient_DOB.substring(6, 10)), Integer.parseInt(OnlinePatient.strPatient_DOB.substring(3, 5)), Integer.parseInt(OnlinePatient.strPatient_DOB.substring(0, 2)));
-                                        Date CurrentTime = new Date();
-                                        long diffInMs = CurrentTime.getTime() - cDOB.getTimeInMillis();
-                                        Calendar c = Calendar.getInstance();
-                                        c.setTimeInMillis(diffInMs);
-                                        int mYear = c.get(Calendar.YEAR) - 1970;
-                                        OnlinePatient.PatientAge = String.valueOf(mYear);
+                                        cDOB.set(
+                                                Integer.parseInt(OnlinePatient.strPatient_DOB.substring(6, 10)),
+                                                Integer.parseInt(OnlinePatient.strPatient_DOB.substring(3, 5)) - 1,
+                                                Integer.parseInt(OnlinePatient.strPatient_DOB.substring(0, 2))
+                                        );
+                                        Calendar today = Calendar.getInstance();
+                                        int age = today.get(Calendar.YEAR) - cDOB.get(Calendar.YEAR);
+                                        if (today.get(Calendar.DAY_OF_YEAR) < cDOB.get(Calendar.DAY_OF_YEAR)) {
+                                            age--;
+                                        }
+                                        OnlinePatient.PatientAge = String.valueOf(age);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
 
                                     CalendarDOB = Calendar.getInstance();
                                     try {
-                                        CalendarDOB.set(Integer.parseInt(OnlinePatient.strPatient_DOB.substring(6, 10)), Integer.parseInt(OnlinePatient.strPatient_DOB.substring(3, 5)), Integer.parseInt(OnlinePatient.strPatient_DOB.substring(0, 2)));
-                                        Date CurrentTime = new Date();
-                                        long diffInMs = CurrentTime.getTime() - CalendarDOB.getTimeInMillis();
-                                        Calendar c = Calendar.getInstance();
-                                        c.setTimeInMillis(diffInMs);
-                                        int mYear = c.get(Calendar.YEAR) - 1970;
-                                        OnlinePatient.PatientAge = String.valueOf(mYear);
-                                    }catch (NumberFormatException e) {
+                                        CalendarDOB.set(
+                                                Integer.parseInt(OnlinePatient.strPatient_DOB.substring(6, 10)),
+                                                Integer.parseInt(OnlinePatient.strPatient_DOB.substring(3, 5)) - 1,
+                                                Integer.parseInt(OnlinePatient.strPatient_DOB.substring(0, 2))
+                                        );
+                                        Calendar today = Calendar.getInstance();
+                                        int age = today.get(Calendar.YEAR) - CalendarDOB.get(Calendar.YEAR);
+                                        if (today.get(Calendar.DAY_OF_YEAR) < CalendarDOB.get(Calendar.DAY_OF_YEAR)) {
+                                            age--;
+                                        }
+                                        OnlinePatient.PatientAge = String.valueOf(age);
+                                    } catch (NumberFormatException e) {
                                         final Calendar c = Calendar.getInstance();
                                         CalendarDOB.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH));
                                         CalendarDOB.set(Calendar.MONTH, c.get(Calendar.MONTH));
-                                        CalendarDOB.set(Calendar.YEAR, (c.get(Calendar.YEAR) - 40));
+                                        CalendarDOB.set(Calendar.YEAR, c.get(Calendar.YEAR) - 40);
                                         OnlinePatient.PatientAge = "40";
                                     }
                                     try {
@@ -11551,13 +11560,17 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     strSearchPatientAge = "";
                 } else {
                     Calendar cDOB = Calendar.getInstance();
-                    cDOB.set(Integer.parseInt(strSearchPatient_DOB.substring(6, 10)), Integer.parseInt(strSearchPatient_DOB.substring(3, 5)), Integer.parseInt(strSearchPatient_DOB.substring(0, 2)));
-                    Date CurrentTime = new Date();
-                    long diffInMs = CurrentTime.getTime() - cDOB.getTimeInMillis();
-                    Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(diffInMs);
-                    int mYear = c.get(Calendar.YEAR) - 1970;
-                    strSearchPatientAge = String.valueOf(mYear);
+                    cDOB.set(
+                            Integer.parseInt(strSearchPatient_DOB.substring(6, 10)),
+                            Integer.parseInt(strSearchPatient_DOB.substring(3, 5)) - 1,
+                            Integer.parseInt(strSearchPatient_DOB.substring(0, 2))
+                    );
+                    Calendar today = Calendar.getInstance();
+                    int age = today.get(Calendar.YEAR) - cDOB.get(Calendar.YEAR);
+                    if (today.get(Calendar.DAY_OF_YEAR) < cDOB.get(Calendar.DAY_OF_YEAR)) {
+                        age--;
+                    }
+                    strSearchPatientAge = String.valueOf(age);
                 }
 
                 tv = (TextView)findViewById(R.id.editTextFirstName);
@@ -14252,17 +14265,21 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             Toast.makeText(getBaseContext(), "Invalid Date, Please Try Again!", Toast.LENGTH_SHORT).show();
         } else {
 //            Calendar cDOB = Calendar.getInstance();
-            CalendarDOB.set(Integer.parseInt(selectedValue.substring(6, 10)), Integer.parseInt(selectedValue.substring(3, 5)), Integer.parseInt(selectedValue.substring(0, 2)));
-            Date CurrentTime = new Date();
-            long diffInMs = CurrentTime.getTime() - CalendarDOB.getTimeInMillis();
-            Calendar c = Calendar.getInstance();
-            c.setTimeInMillis(diffInMs);
-            int mYear = c.get(Calendar.YEAR) - 1970;
+            CalendarDOB.set(
+                    Integer.parseInt(selectedValue.substring(6, 10)),
+                    Integer.parseInt(selectedValue.substring(3, 5)) - 1,
+                    Integer.parseInt(selectedValue.substring(0, 2))
+            );
 
-            if( (CurrentLayoutResourceID == R.layout.activity_patient_details) ||
-                (CurrentLayoutResourceID == R.layout.activity_patient_details) ) {
+            Calendar today = Calendar.getInstance();
+            int age = today.get(Calendar.YEAR) - CalendarDOB.get(Calendar.YEAR);
+            if (today.get(Calendar.DAY_OF_YEAR) < CalendarDOB.get(Calendar.DAY_OF_YEAR)) {
+                age--;
+            }
+            if ((CurrentLayoutResourceID == R.layout.activity_patient_details) ||
+                    (CurrentLayoutResourceID == R.layout.activity_patient_details)) {
                 TextView tv = (TextView) findViewById(R.id.editTextAge);
-                tv.setText(String.valueOf(mYear));
+                tv.setText(String.valueOf(age));
             }
             TextView tv1 = (TextView) findViewById(R.id.textViewDOB);
             tv1.setText(selectedValue);
@@ -14370,16 +14387,21 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 if(objPatient.strPatient_DOB.isEmpty()) {
                     objPatient.PatientAge = "";
                 } else {
-                    Calendar cDOB = Calendar.getInstance();
-                    cDOB.set(Integer.parseInt(objPatient.strPatient_DOB.substring(6, 10)), Integer.parseInt(objPatient.strPatient_DOB.substring(3, 5)), Integer.parseInt(objPatient.strPatient_DOB.substring(0, 2)));
-                    Date CurrentTime = new Date();
-                    long diffInMs = CurrentTime.getTime() - cDOB.getTimeInMillis();
-                    Calendar c = Calendar.getInstance();
-                    c.setTimeInMillis(diffInMs);
-                    int mYear = c.get(Calendar.YEAR) - 1970;
-                    objPatient.PatientAge = String.valueOf(mYear);
-                }
 
+                    Calendar cDOB = Calendar.getInstance();
+                    cDOB.set(
+                            Integer.parseInt(objPatient.strPatient_DOB.substring(6, 10)),
+                            Integer.parseInt(objPatient.strPatient_DOB.substring(3, 5)) - 1,
+                            Integer.parseInt(objPatient.strPatient_DOB.substring(0, 2))
+                    );
+
+                    Calendar today = Calendar.getInstance();
+                    int age = today.get(Calendar.YEAR) - cDOB.get(Calendar.YEAR);
+                    if (today.get(Calendar.DAY_OF_YEAR) < cDOB.get(Calendar.DAY_OF_YEAR)) {
+                        age--;
+                    }
+                    objPatient.PatientAge = String.valueOf(age);
+                }
                 RadioGroup rg;
                 RadioButton rb;
                 rg = (RadioGroup)findViewById(R.id.radioGroupGender);
