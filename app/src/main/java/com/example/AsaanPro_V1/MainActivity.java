@@ -1701,185 +1701,69 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if(lTemp2 > 0) {
         }
 
-        ContentValues values3 = new ContentValues();
-        values3.put(esygDbContract.CountryMaster.COLUMN_NAME_CountryID, 9);
-        values3.put(esygDbContract.CountryMaster.COLUMN_NAME_Country, "India");
+        insertCountry(db, 9, "India");
 
-        // Insert single row, returning the primary key value of the row
-        long lTemp3 = db.insert(esygDbContract.CountryMaster.TABLE_NAME, null, values3);
-        if(lTemp3 > 0) {
-        }
+        insertState(db, 5, "Maharashtra", 9);
+        insertState(db, 7, "Kerala", 9);
+        insertState(db, 8, "Punjab", 9);
+        insertState(db, 9, "Andhra Pradesh", 9);
+        insertState(db, 10, "Arunachal Pradesh", 9);
+        insertState(db, 11, "Assam", 9);
+        insertState(db, 12, "Bihar", 9);
+        insertState(db, 13, "Chhattisgarh", 9);
+        insertState(db, 14, "Goa", 9);
+        insertState(db, 15, "Gujarat", 9);
+        insertState(db, 16, "Haryana", 9);
+        insertState(db, 17, "Himachal Pradesh", 9);
+        insertState(db, 18, "Jammu and Kashmir", 9);
+        insertState(db, 19, "Jharkhand", 9);
+        insertState(db, 20, "Karnataka", 9);
+        insertState(db, 22, "Madhya Pradesh", 9);
+        insertState(db, 24, "Manipur", 9);
+        insertState(db, 25, "Meghalaya", 9);
+        insertState(db, 26, "Mizoram", 9);
+        insertState(db, 27, "Nagaland", 9);
+        insertState(db, 28, "Odisha", 9);
+        insertState(db, 30, "Rajasthan", 9);
+        insertState(db, 31, "Sikkim", 9);
+        insertState(db, 32, "Tamil Nadu", 9);
+        insertState(db, 33, "Telangana", 9);
+        insertState(db, 34, "Tripura", 9);
+        insertState(db, 35, "Uttar Pradesh", 9);
+        insertState(db, 36, "Uttarakhand", 9);
+        insertState(db, 37, "West Bengal", 9);
+        insertState(db, 38, "Andaman and Nicobar Islands", 9);
+        insertState(db, 39, "Chandigarh", 9);
+        insertState(db, 40, "Dadra and Nagar Haveli", 9);
+        insertState(db, 41, "Daman and Diu", 9);
+        insertState(db, 42, "Delhi", 9);
+        insertState(db, 43, "Lakshadweep", 9);
+        insertState(db, 44, "Puducherry", 9);
 
-        ContentValues values4 = new ContentValues();
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 5);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Maharashtra");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 7);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Kerala");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 8);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Punjab");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Andhra Pradesh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 10);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Arunachal Pradesh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 11);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Assam");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 12);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Bihar");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 13);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Chhattisgarh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 14);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Goa");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 15);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Gujarat");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 16);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Haryana");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 17);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Himachal Pradesh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 18);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Jammu and Kashmir");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 19);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Jharkhand");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 20);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Karnataka");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 22);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Madhya Pradesh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 24);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Manipur");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 25);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Meghalaya");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 26);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Mizoram");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 27);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Nagaland");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 28);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Odisha");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 30);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Rajasthan");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 31);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Sikkim");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 32);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Tamil Nadu");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 33);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Telangana");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 34);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Tripura");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 35);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Uttar Pradesh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 36);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Uttarakhand");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 37);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "West Bengal");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 38);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Andaman and Nicobar Islands");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 39);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Chandigarh");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 40);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Dadara and Nagar Haveli");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 41);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Daman and Diu");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 42);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Delhi");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 43);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Lakshadweep");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, 44);
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_State, "Puducherry");
-        values4.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, 9);
-
-        // Insert single row, returning the primary key value of the row
-        long lTemp4 = db.insert(esygDbContract.StateMaster.TABLE_NAME, null, values4);
-        if(lTemp4 > 0) {
-        }
-
-        ContentValues values5 = new ContentValues();
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 1);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Bajaj Allianz");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 2);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Magma HDI General Insurance Company Limited");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 3);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Shriram General Insurance Company");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 4);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Religare Health Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 5);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "L & T General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 6);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "MAX Bupa Health Insurance Company Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 7);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Raheja QBE General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 8);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "SBI General Insurance Company Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 9);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Bharti AXA General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 10);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Universal Sompo General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 11);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "HDFC ERGO General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 12);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Cholamandalam MS General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 13);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Tata AIG General Insurance Co. Ltd.");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 14);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Royal Sundaram Alliance Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 15);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "United India Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 16);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Reliance General Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 17);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "The Oriental Insurance Co. Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 18);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "The New India Assurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 19);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "National Insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 20);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Cigna TTK");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 21);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "ICICI Lombard General Insurance Co. Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 22);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Future Generali India Insurance Company Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 23);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Star Health and Allied insurance Co Ltd");
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, 24);
-        values5.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, "Apollo Munich Health Insurance Company Limited");
-
-        // Insert single row, returning the primary key value of the row
-        long lTemp5 = db.insert(esygDbContract.InsuranceProviderMaster.TABLE_NAME, null, values5);
-        if(lTemp5 > 0) {
-        }
-
+        insertInsuranceProvider(db, 1, "Bajaj Allianz");
+        insertInsuranceProvider(db, 2, "Magma HDI General Insurance Company Limited");
+        insertInsuranceProvider(db, 3, "Shriram General Insurance Company");
+        insertInsuranceProvider(db, 4, "Religare Health Insurance Co Ltd");
+        insertInsuranceProvider(db, 5, "L & T General Insurance Co Ltd");
+        insertInsuranceProvider(db, 6, "MAX Bupa Health Insurance Company Ltd");
+        insertInsuranceProvider(db, 7, "Raheja QBE General Insurance Co Ltd");
+        insertInsuranceProvider(db, 8, "SBI General Insurance Company Ltd");
+        insertInsuranceProvider(db, 9, "Bharti AXA General Insurance Co Ltd");
+        insertInsuranceProvider(db, 10, "Universal Sompo General Insurance Co Ltd");
+        insertInsuranceProvider(db, 11, "HDFC ERGO General Insurance Co Ltd");
+        insertInsuranceProvider(db, 12, "Cholamandalam MS General Insurance Co Ltd");
+        insertInsuranceProvider(db, 13, "Tata AIG General Insurance Co. Ltd.");
+        insertInsuranceProvider(db, 14, "Royal Sundaram Alliance Insurance Co Ltd");
+        insertInsuranceProvider(db, 15, "United India Insurance Co Ltd");
+        insertInsuranceProvider(db, 16, "Reliance General Insurance Co Ltd");
+        insertInsuranceProvider(db, 17, "The Oriental Insurance Co. Ltd");
+        insertInsuranceProvider(db, 18, "The New India Assurance Co Ltd");
+        insertInsuranceProvider(db, 19, "National Insurance Co Ltd");
+        insertInsuranceProvider(db, 20, "Cigna TTK");
+        insertInsuranceProvider(db, 21, "ICICI Lombard General Insurance Co. Ltd");
+        insertInsuranceProvider(db, 22, "Future Generali India Insurance Company Ltd");
+        insertInsuranceProvider(db, 23, "Star Health and Allied insurance Co Ltd");
+        insertInsuranceProvider(db, 24, "Apollo Munich Health Insurance Company Limited");
         ContentValues values6 = new ContentValues();
 //bmp 30-Apr-25
 //        values6.put(esygDbContract.HistoryConditionsMaster.COLUMN_NAME_HistoryConditionsID, 2);
@@ -2201,6 +2085,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         db.close();
     }
 
+    private void insertCountry(SQLiteDatabase db, int id, String name) {
+        ContentValues values = new ContentValues();
+        values.put(esygDbContract.CountryMaster.COLUMN_NAME_CountryID, id);
+        values.put(esygDbContract.CountryMaster.COLUMN_NAME_Country, name);
+        db.insert(esygDbContract.CountryMaster.TABLE_NAME, null, values);
+    }
+
+    private void insertState(SQLiteDatabase db, int id, String name, int countryId) {
+        ContentValues values = new ContentValues();
+        values.put(esygDbContract.StateMaster.COLUMN_NAME_StateID, id);
+        values.put(esygDbContract.StateMaster.COLUMN_NAME_State, name);
+        values.put(esygDbContract.StateMaster.COLUMN_NAME_StateInCountryID, countryId);
+        db.insert(esygDbContract.StateMaster.TABLE_NAME, null, values);
+    }
+
+    private void insertInsuranceProvider(SQLiteDatabase db, int id, String name) {
+        ContentValues values = new ContentValues();
+        values.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID, id);
+        values.put(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider, name);
+        db.insert(esygDbContract.InsuranceProviderMaster.TABLE_NAME, null, values);
+    }
+
     public void ReadHWVersion() {
         esygDbHelper mDbHelper = new esygDbHelper(getBaseContext());
         // Gets the data repository in write mode
@@ -2478,8 +2384,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     try {
                         int iInsuranceProviderID = c1.getInt(c1.getColumnIndexOrThrow(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProviderID));
                         String strInsuranceProvider = c1.getString(c1.getColumnIndexOrThrow(esygDbContract.InsuranceProviderMaster.COLUMN_NAME_InsuranceProvider));
-                        CountryIDMaster.add(iInsuranceProviderID);
-                        CountryMaster.add(strInsuranceProvider);
+                      /*  CountryIDMaster.add(iInsuranceProviderID);
+                        CountryMaster.add(strInsuranceProvider);*/
+                        InsuranceProviderIDMaster.add(iInsuranceProviderID);
+                        InsuranceProviderMaster.add(strInsuranceProvider);
                         InsuranceProviderMasterLength++;
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -14143,55 +14051,111 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             CheckBox cb = (CheckBox) findViewById(R.id.checkBoxIsInsured);
             cb.setChecked(objPatient.bIsInsured);
 
-            ArrayAdapter<String> adapterState = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_dropdown_item_1line, StateMaster);
-            Spinner sp = (Spinner) findViewById(R.id.spinnerState);
-            sp.setAdapter(adapterState);
-            sp.setOnItemSelectedListener(this);
+            ArrayAdapter<String> adapterState = new ArrayAdapter<String>(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    StateMaster
+            );
+            adapterState.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-            int iTemp = Integer.parseInt(objPatient.strPatient_State);
-            for (int i = 0; i < StateIDMaster.size(); i++) {
-                if (iTemp == StateIDMaster.get(i)) {
-                    sp.setSelection(i);
-                    break;
-                }
-            }
+            Spinner spinnerState = (Spinner) findViewById(R.id.spinnerState);
+            spinnerState.setAdapter(adapterState);
+            spinnerState.setOnItemSelectedListener(this);
+            spinnerState.setEnabled(true);
+            spinnerState.setClickable(true);
 
-            ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_dropdown_item_1line, CountryMaster);
-            sp = (Spinner) findViewById(R.id.spinnerCountry);
-            sp.setAdapter(adapterCountry);
-            sp.setOnItemSelectedListener(this);
-
-            iTemp = Integer.parseInt(objPatient.strPatient_CountryID);
-            for (int i = 0; i < CountryIDMaster.size(); i++) {
-                if (iTemp == CountryIDMaster.get(i)) {
-                    sp.setSelection(i);
-                    break;
-                }
-            }
-
-            ArrayAdapter<String> adapterInsuranceProvider = new ArrayAdapter<String>(this,
-                    android.R.layout.simple_dropdown_item_1line, InsuranceProviderMaster);
-            sp = (Spinner) findViewById(R.id.spinnerInsuranceProviderID);
-            sp.setAdapter(adapterInsuranceProvider);
-            sp.setOnItemSelectedListener(this);
+            TextView textViewState = (TextView) findViewById(R.id.textViewState);
+            textViewState.setOnClickListener(v -> spinnerState.performClick());
 
             try {
-                int iTemp3 = Integer.parseInt(objPatient.strInsuranceProviderID);
+                int iTemp = Integer.parseInt(objPatient.strPatient_State);
+
+                for (int i = 0; i < StateIDMaster.size(); i++) {
+                    if (iTemp == StateIDMaster.get(i)) {
+                        spinnerState.setSelection(i);
+                        break;
+                    }
+                }
             } catch (NumberFormatException e) {
-                objPatient.strInsuranceProviderID = "1";
-            }
-            iTemp = Integer.parseInt(objPatient.strInsuranceProviderID);
-            for (int i = 0; i < InsuranceProviderIDMaster.size(); i++) {
-                if (iTemp == InsuranceProviderIDMaster.get(i)) {
-                    sp.setSelection(i);
-                    break;
+                if (StateMaster.size() > 0) {
+                    spinnerState.setSelection(0);
                 }
             }
-            sp.invalidate();
 
-            sp.setEnabled(objPatient.bIsInsured);
+
+            ArrayAdapter<String> adapterCountry = new ArrayAdapter<String>(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    CountryMaster
+            );
+            adapterCountry.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            Spinner spinnerCountry = (Spinner) findViewById(R.id.spinnerCountry);
+            spinnerCountry.setAdapter(adapterCountry);
+            spinnerCountry.setOnItemSelectedListener(this);
+            spinnerCountry.setEnabled(true);
+            spinnerCountry.setClickable(true);
+
+            TextView textViewCountry = (TextView) findViewById(R.id.textViewCountry);
+            textViewCountry.setOnClickListener(v -> spinnerCountry.performClick());
+
+            try {
+                int iTemp = Integer.parseInt(objPatient.strPatient_CountryID);
+
+                for (int i = 0; i < CountryIDMaster.size(); i++) {
+                    if (iTemp == CountryIDMaster.get(i)) {
+                        spinnerCountry.setSelection(i);
+                        break;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                if (CountryMaster.size() > 0) {
+                    spinnerCountry.setSelection(0);
+                }
+            }
+
+
+            ArrayAdapter<String> adapterInsuranceProvider = new ArrayAdapter<String>(
+                    this,
+                    android.R.layout.simple_spinner_item,
+                    InsuranceProviderMaster
+            );
+            adapterInsuranceProvider.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            Spinner spinnerInsuranceProvider = (Spinner) findViewById(R.id.spinnerInsuranceProviderID);
+            spinnerInsuranceProvider.setAdapter(adapterInsuranceProvider);
+            spinnerInsuranceProvider.setOnItemSelectedListener(this);
+
+            try {
+                int iTemp = Integer.parseInt(objPatient.strInsuranceProviderID);
+
+                for (int i = 0; i < InsuranceProviderIDMaster.size(); i++) {
+                    if (iTemp == InsuranceProviderIDMaster.get(i)) {
+                        spinnerInsuranceProvider.setSelection(i);
+                        break;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                objPatient.strInsuranceProviderID = "1";
+
+                if (InsuranceProviderMaster.size() > 0) {
+                    spinnerInsuranceProvider.setSelection(0);
+                }
+            }
+
+            spinnerInsuranceProvider.invalidate();
+
+            spinnerInsuranceProvider.setEnabled(objPatient.bIsInsured);
+            spinnerInsuranceProvider.setClickable(objPatient.bIsInsured);
+
+            TextView textViewInsuranceProvider = (TextView) findViewById(R.id.textViewInsuranceProvider);
+            textViewInsuranceProvider.setOnClickListener(v -> {
+                if (spinnerInsuranceProvider.isEnabled()) {
+                    spinnerInsuranceProvider.performClick();
+                }
+            });
+
+            spinnerInsuranceProvider.invalidate();
         }
 
         InitPatientDOB();
