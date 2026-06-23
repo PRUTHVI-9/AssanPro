@@ -2462,6 +2462,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     PrintBeforeSend = Boolean.valueOf(c1.getString(c1.getColumnIndexOrThrow(esygDbContract.ConfigMaster.COLUMN_NAME_PrintBeforeSend)));
                     ColorPrint = Boolean.valueOf(c1.getString(c1.getColumnIndexOrThrow(esygDbContract.ConfigMaster.COLUMN_NAME_ColorPrint)));
                     HRPrint = Boolean.valueOf(c1.getString(c1.getColumnIndexOrThrow(esygDbContract.ConfigMaster.COLUMN_NAME_HRPrint)));
+                    HRPrint = true;
                     CommentsPrint = true;
                     TakenByPrint = true;
                     BordersPrint = Boolean.valueOf(c1.getString(c1.getColumnIndexOrThrow(esygDbContract.ConfigMaster.COLUMN_NAME_BordersPrint)));
@@ -12398,8 +12399,11 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             cb.setChecked(ColorPrint);
 
 //            HRPrint = Boolean.valueOf(br.readLine());
+            HRPrint = true;
+
             cb = (CheckBox) findViewById(R.id.checkBox5);
-            cb.setChecked(HRPrint);
+            cb.setChecked(true);
+            cb.setEnabled(false);   // user uncheck करू शकणार नाही
 
             CommentsPrint = true;
             TakenByPrint = true;
@@ -12854,8 +12858,11 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 
                     cb = (CheckBox) findViewById(R.id.checkBox5);
                     HRPrint = cb.isChecked();
-                    cb = (CheckBox) findViewById(R.id.checkBox8);
-                    BordersPrint = cb.isChecked();
+
+                    HRPrint = true;
+
+                    cb = (CheckBox) findViewById(R.id.checkBox5);
+                    cb.setChecked(true);
 
                     RadioGroup rg;
                     RadioButton rb;
