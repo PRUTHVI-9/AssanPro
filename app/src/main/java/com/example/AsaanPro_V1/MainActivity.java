@@ -6344,18 +6344,27 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
         document.finishPage(page);
         // write the document content
         File PdfFile = new File(StrPDFReportPreview);
+
         try {
-            document.writeTo(new FileOutputStream(PdfFile));
-//bmp 21-Nov-25
-//            String StrPDFReportUpload = baseDir + "/data/" + acqScan.strScanFileName + ".pdf";
-            String StrPDFReportUpload = getBaseContext().getCacheDir() + File.separator + acqScan.strScanFileName + ".pdf";
+            try (FileOutputStream fos = new FileOutputStream(PdfFile)) {
+                document.writeTo(fos);
+                fos.flush();
+            }
+
+            String StrPDFReportUpload = getBaseContext().getCacheDir()
+                    + File.separator + acqScan.strScanFileName + ".pdf";
+
             File PdfFile2 = new File(StrPDFReportUpload);
-            document.writeTo(new FileOutputStream(PdfFile2));
-//bmp 21-Nov-25
+
+            copyFile(PdfFile, PdfFile2);
+
         } catch (FileNotFoundException e) {
-        } catch (IOException e1) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "PDF file create failed", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "PDF write failed", Toast.LENGTH_SHORT).show();
         } finally {
-            // close the document
             document.close();
         }
 ///////////////////////////////////////////
@@ -9646,6 +9655,21 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
     }
     }
 
+    private void copyFile(File source, File dest) throws IOException {
+        try (FileInputStream in = new FileInputStream(source);
+             FileOutputStream out = new FileOutputStream(dest)) {
+
+            byte[] buffer = new byte[8192];
+            int len;
+
+            while ((len = in.read(buffer)) > 0) {
+                out.write(buffer, 0, len);
+            }
+
+            out.flush();
+        }
+    }
+
     ActivityResultLauncher<Intent> startActivityIntent = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -10699,8 +10723,17 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                             strOriginatingCenter = sObject.get("OriginatingCenterName").toString();
                             if(strOriginatingCenter.length() > 50)
                                 strOriginatingCenter = strOriginatingCenter.trim().substring(0, 50);
-                            strPrinterEmailAddress = sObject.get("PrinterEmailID").toString();
-                            strDrEmailAddress = sObject.get("PhysicianEmailID").toString();
+                           /* strPrinterEmailAddress = sObject.get("PrinterEmailID").toString();
+                            strDrEmailAddress = sObject.get("PhysicianEmailID").toString();*/
+                            String serverPrinterEmail = sObject.optString("PrinterEmailID", "").trim();
+                            if (!serverPrinterEmail.isEmpty()) {
+                                strPrinterEmailAddress = serverPrinterEmail;
+                            }
+
+                            String serverDrEmail = sObject.optString("PhysicianEmailID", "").trim();
+                            if (!serverDrEmail.isEmpty()) {
+                                strDrEmailAddress = serverDrEmail;
+                            }
                             strReportDisclaimer = sObject.get("ReportDisclaimer").toString();
 
                             strInstitutionLogoURL = sObject.get("InstitutionLogoURL").toString();
@@ -12102,12 +12135,29 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             document.finishPage(page);
             // write the document content
             File PdfFile = new File(StrPDFReportPreview);
+
             try {
-                document.writeTo(new FileOutputStream(PdfFile));
+                try (FileOutputStream fos = new FileOutputStream(PdfFile)) {
+                    document.writeTo(fos);
+                    fos.flush();
+                }
+
+                if (!PdfFile.exists() || PdfFile.length() <= 0) {
+                    Toast.makeText(getBaseContext(), "PDF file is empty. Please try again.", Toast.LENGTH_SHORT).show();
+                    return null;
+                }
+
             } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getBaseContext(), "PDF file create failed", Toast.LENGTH_SHORT).show();
+                return null;
+
             } catch (IOException e1) {
+                e1.printStackTrace();
+                Toast.makeText(getBaseContext(), "PDF write failed", Toast.LENGTH_SHORT).show();
+                return null;
+
             } finally {
-                // close the document
                 document.close();
             }
 ////////////////////////////

@@ -22,7 +22,7 @@
     <string name="ipnumeric_keys">0123456789.</string>
     <string name="telenumeric_keys">0123456789+</string>
     <string name="alphabet_keys">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ</string>
-    <string name="alpha_numeric_keys">abcdefghijklmnopqrstuvwxyz 0123456789</string>
+    <string name="alpha_numeric_keys">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
     <string name="alpha_small_cap_numeric_keys">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789</string>
     <string name="alpha_numeric_hiphen_keys">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789~!@#$%^*()-_=+[{]}\|;:\'",./?</string>
     <string name="history_condition_keys">abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ,()</string>
