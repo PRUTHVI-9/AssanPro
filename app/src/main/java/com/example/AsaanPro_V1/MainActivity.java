@@ -213,11 +213,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String MSG_COMM_NETWORK_ERROR           =
             "Not Connected to Active Network. asaan Offline Mode.";
     public static final String MSG_USB_CONNECTION_ERROR0        =
-            "AsaanPro Disconnected, Click OK to Exit";
+            "HN-Smart Disconnected, Click OK to Exit";
     public static final String MSG_USB_CONNECTION_ERROR1        =
-            "AsaanPro Disconnected, Click OK to Exit";
+            "HN-Smart Disconnected, Click OK to Exit";
     public static final String MSG_USB_CONNECTION_ERROR2        =
-            "AsaanPro Not Closed properly, Please Try Again.";
+            "HN-Smart Not Closed properly, Please Try Again.";
     public static final String MSG_PATIENT_NOT_REGISTERED       =
             "Patient Not Registered, Please Try Again Later.";
     public static final String MSG_EMERGENCY_PATIENT_NOT_REGISTERED       =
@@ -406,7 +406,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final String SPEED_MEDIUM = "25.0mm/sec";
     public static final String SPEED_HIGH = "50.0mm/sec";
 
-    public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.1";   // psy 01/06/2026 public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.0";     //15-Jan-2024
+    public static final String PRODUCT_NAME = "Heartnet HN-Smart 2.0";   // psy 01/06/2026 public static final String PRODUCT_NAME = "Heartnet AsaanPro 1.0";     //15-Jan-2024
 
 //    public static final String DISCLAIMER 			= "*Unconfirmed Reporting, Unless Referred to Clinician.";
 //    public static final float DISCLAIMER_X 			= 150;
@@ -1470,7 +1470,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         tv.setText("Version " + ASAAN_PRO_VERSION);
 
         tv = (TextView) findViewById(R.id.textViewStatus);
-        tv.setText(StrHWDeviceID + "-" + String.valueOf(HWMainVersion) + "." + String.valueOf(HWSubVersion));
+      //  tv.setText(StrHWDeviceID + "-" + String.valueOf(HWMainVersion) + "." + String.valueOf(HWSubVersion));
+        tv.setText(StrHWDeviceID + "-" + String.valueOf(HWMainVersion) + "." + "2.0");
 
         Button bt = (Button) findViewById(R.id.buttonEmergency);
         if(alEmergencyScan.size() < PendingEmergencyLimit)
