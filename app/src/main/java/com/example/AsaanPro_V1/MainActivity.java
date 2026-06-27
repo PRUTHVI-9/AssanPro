@@ -1589,10 +1589,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        strServerIP = "52.38.196.35:90";
 //        strServerIP = "heartnetnetindiademo.in";
 //        strServerIP = "heartnetindia.in";
-//        strServerIP = "dev2.heartnetnetindiademo.in";
+        strServerIP = "dev.heartnetnetindiademo.in";
 //        strServerIP = "liveclone.heartnetindia.in";
 //bmp 05-Aug-25
-        strServerIP = "123.201.117.218:7104";
+//        strServerIP = "123.201.117.218:7104";
 //bmp 05-Aug-25
         PrintGainScale = 1;
         strPrinterEmailAddress = "";
@@ -6261,12 +6261,12 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
                 fos.flush();
             }
 
-            String StrPDFReportUpload = getBaseContext().getCacheDir()
-                    + File.separator + acqScan.strScanFileName + ".pdf";
+            String StrTMPReportUpload = getBaseContext().getCacheDir()
+                    + File.separator + acqScan.strScanFileName + ".tmp";
 
-            File PdfFile2 = new File(StrPDFReportUpload);
+            File TmpFile = new File(StrTMPReportUpload);
 
-            copyFile(PdfFile, PdfFile2);
+            copyFile(PdfFile, TmpFile);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -9126,8 +9126,9 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 
                 String StrECGFileName = StrPatientSample + ".ecg";
 //bmp 21-Nov-25
-//                String StrTMPFileName = StrPatientSample + ".tmp";
-                String StrPDFFileName = StrPatientSample + ".pdf";
+               /* String StrTMPFileName = StrPatientSample + ".tmp";
+//                String StrPDFFileName = StrPatientSample + ".pdf";
+                                byte[] bytearraytmp = new byte[0];
                 byte[] bytearraypdf = new byte[0];
 //                File pdfFile = new File(baseDir + "/data/" + StrPatientSample + ".pdf");
                 File pdfFile = new File(getBaseContext().getCacheDir() + File.separator + StrPatientSample + ".pdf");
@@ -9144,6 +9145,20 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                }*/
+                String StrTMPFileName = StrPatientSample + ".tmp";
+                byte[] bytearraytmp = new byte[0];
+
+                File tmpFile = new File(getBaseContext().getCacheDir()
+                        + File.separator + StrPatientSample + ".tmp");
+
+                if (tmpFile.exists()) {
+                    int iLength = (int) tmpFile.length();
+                    bytearraytmp = new byte[iLength];
+
+                    FileInputStream inputStream = new FileInputStream(tmpFile);
+                    inputStream.read(bytearraytmp);
+                    inputStream.close();
                 }
 //bmp 21-Nov-25
                 OkHttpClient client = new OkHttpClient().newBuilder()
@@ -9159,9 +9174,9 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                        .addFormDataPart("files",StrTMPFileName,
 //                                RequestBody.create(MediaType.parse("application/octet-stream"),
 //                                        bytearraysignal))
-                        .addFormDataPart("files",StrPDFFileName,
+                        .addFormDataPart("files", StrTMPFileName,
                                 RequestBody.create(MediaType.parse("application/octet-stream"),
-                                        bytearraypdf))
+                                        bytearraytmp))
 //bmp 21-Nov-25
                         .build();
                 Request request = new Request.Builder()
@@ -9184,11 +9199,11 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //bmp 21-Nov-25
 //                                if(bytearraydata.length == joArr.getJSONObject(0).getInt("size")) {
                                 if(     (bytearraydata.length == joArr.getJSONObject(0).getInt("size")) &&
-                                        (bytearraypdf.length == joArr.getJSONObject(1).getInt("size")) ) {
+                                        (bytearraytmp.length == joArr.getJSONObject(1).getInt("size"))) {
 //                                    pdfFile = new File(baseDir + "/data/" + StrPatientSample + ".pdf");
-                                    pdfFile = new File(getBaseContext().getCacheDir() + File.separator + StrPatientSample + ".pdf");
-                                    if(pdfFile.exists()) {
-                                        pdfFile.delete();
+                                    tmpFile = new File(getBaseContext().getCacheDir() + File.separator + StrPatientSample + ".tmp");
+                                    if (tmpFile.exists()) {
+                                        tmpFile.delete();
                                     }
 //bmp 21-Nov-25
                                     String Str = CollectedSampleList.get(j);
@@ -9546,7 +9561,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
         sendIntent.putExtra(Intent.EXTRA_STREAM, senduri);
 
             // IMPORTANT
-            sendIntent.setType("application/pdf");
+            sendIntent.setType("application/octet-stream");
 
             sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
