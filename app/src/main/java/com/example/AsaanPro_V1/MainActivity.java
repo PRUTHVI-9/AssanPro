@@ -1045,6 +1045,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public PdfRenderer.Page renderer_page;
     public Bitmap mBitmap;
 
+    public String strEmergencyAge = "";
+    public String strEmergencyGender = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1473,16 +1476,54 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
       //  tv.setText(StrHWDeviceID + "-" + String.valueOf(HWMainVersion) + "." + String.valueOf(HWSubVersion));
         tv.setText(StrHWDeviceID + "-" + String.valueOf(HWMainVersion) + "." + "2.0");
 
-        Button bt = (Button) findViewById(R.id.buttonEmergency);
+      /*  Button bt = (Button) findViewById(R.id.buttonEmergency);
         if(alEmergencyScan.size() < PendingEmergencyLimit)
             bt.setEnabled(true);
         else
             bt.setEnabled(false);
-
+*/
+        initEmergencyInputValidation();
         CurrentPatientIndex = -1;
 //bmp 21-Mar-24
         SyncServerEnable = true;
 //bmp 21-Mar-24
+    }
+
+    private void initEmergencyInputValidation() {
+        EditText ageEditText = (EditText) findViewById(R.id.editTextAge);
+        RadioGroup genderGroup = (RadioGroup) findViewById(R.id.radioGroupGender);
+
+        updateEmergencyButtonState();
+
+        ageEditText.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateEmergencyButtonState();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        genderGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                updateEmergencyButtonState();
+            }
+        });
+    }
+
+    private void updateEmergencyButtonState() {
+        Button bt = (Button) findViewById(R.id.buttonEmergency);
+        EditText ageEditText = (EditText) findViewById(R.id.editTextAge);
+        RadioGroup genderGroup = (RadioGroup) findViewById(R.id.radioGroupGender);
+
+        boolean ageEntered = ageEditText != null
+                && ageEditText.getText() != null
+                && ageEditText.getText().toString().trim().length() > 0;
+
+        boolean genderSelected = genderGroup != null
+                && genderGroup.getCheckedRadioButtonId() != -1;
+
+        bt.setEnabled(ageEntered && genderSelected && alEmergencyScan.size() < PendingEmergencyLimit);
     }
 
     public class MyAdapter extends ArrayAdapter<String> {
@@ -1588,8 +1629,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         QRSLead = "Lead II";
 //        strServerIP = "52.38.196.35:90";
 //        strServerIP = "heartnetnetindiademo.in";
-//        strServerIP = "heartnetindia.in";
-        strServerIP = "dev.heartnetnetindiademo.in";
+        strServerIP = "heartnetindia.in";
+//        strServerIP = "dev.heartnetnetindiademo.in";
 //        strServerIP = "liveclone.heartnetindia.in";
 //bmp 05-Aug-25
 //        strServerIP = "123.201.117.218:7104";
@@ -5118,21 +5159,26 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
     calSet.set(Calendar.MONTH, monthOfYear);
     calSet.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-        if(Emergency) {
-            rptPatient.PatientAge = "";
+    if (Emergency) {
+        if (EmergencyPatient != null
+                && EmergencyPatient.PatientAge != null
+                && !EmergencyPatient.PatientAge.trim().isEmpty()) {
+            rptPatient.PatientAge = EmergencyPatient.PatientAge.trim();
+        } else if (strEmergencyAge != null && !strEmergencyAge.trim().isEmpty()) {
+            rptPatient.PatientAge = strEmergencyAge.trim();
         } else {
-    Calendar calNow = Calendar.getInstance();
-
-    int iYear = calNow.get(Calendar.YEAR);
-
-    int iAge = iYear - year;
-
-    if (calNow.get(Calendar.DAY_OF_YEAR) < calSet.get(Calendar.DAY_OF_YEAR)) {
-        iAge--;
-    }
-
-    rptPatient.PatientAge = String.valueOf(iAge);
+            rptPatient.PatientAge = "";
         }
+    } else {
+        Calendar calNow = Calendar.getInstance();
+
+        int iAge = calNow.get(Calendar.YEAR) - calSet.get(Calendar.YEAR);
+        if (calNow.get(Calendar.DAY_OF_YEAR) < calSet.get(Calendar.DAY_OF_YEAR)) {
+            iAge--;
+        }
+
+        rptPatient.PatientAge = String.valueOf(iAge);
+    }
 
        /* rptPatient.PatientAge = "--";*/
 
@@ -5168,17 +5214,19 @@ public void ParseECGReportDB(clsEcgScan ecgScan, clsPatient rptPatient) {
     //To avoid uninitialized strPatient_Gender in case of old .cmt file
     strTemp = strComments[iCommentsIndex++];
 
-        if(Emergency) {
-
-            rptPatient.strPatient_Gender = "";
-
-        } else {
-
-            if(strTemp != null && !strTemp.trim().isEmpty()) {
+    if (strTemp != null && !strTemp.trim().isEmpty()) {
         rptPatient.strPatient_Gender = strTemp.trim();
-            } else {
-                rptPatient.strPatient_Gender = "";
-            }
+    } else if (Emergency
+            && EmergencyPatient != null
+            && EmergencyPatient.strPatient_Gender != null
+            && !EmergencyPatient.strPatient_Gender.trim().isEmpty()) {
+        rptPatient.strPatient_Gender = EmergencyPatient.strPatient_Gender.trim();
+    } else if (Emergency
+            && strEmergencyGender != null
+            && !strEmergencyGender.trim().isEmpty()) {
+        rptPatient.strPatient_Gender = strEmergencyGender.trim();
+    } else {
+        rptPatient.strPatient_Gender = "";
     }
 
     //To avoid uninitialized strVar in case of old .cmt file
@@ -9860,6 +9908,11 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             currentPatientType = ESY_G_EMERGENCY_PATIENT;
             EmergencyPatient = new clsPatient();
             InitNewPatient(EmergencyPatient);
+            EmergencyPatient.PatientAge = strEmergencyAge;
+            EmergencyPatient.strPatient_Gender = strEmergencyGender;
+            EmergencyPatient.strPatient_DOB = getDobFromAge(strEmergencyAge);
+
+            OnlinePatient = EmergencyPatient;
             PatientDetailsOnline = false;
 
 //            if(DemoMode) {
@@ -9874,6 +9927,19 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             InitECG();
 
             UiChangeListener();
+        }
+    }
+
+    private String getDobFromAge(String ageText) {
+        try {
+            int age = Integer.parseInt(ageText.trim());
+
+            Calendar dob = Calendar.getInstance();
+            dob.add(Calendar.YEAR, -age);
+
+            return new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(dob.getTime());
+        } catch (Exception e) {
+            return "01-01-2000";
         }
     }
 //bmp 06-Aug-25
@@ -12313,6 +12379,19 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 //                UiChangeListener();
 //                break;
             case R.id.buttonEmergency:
+                EditText ageEditText = (EditText) findViewById(R.id.editTextAge);
+                RadioGroup genderGroup = (RadioGroup) findViewById(R.id.radioGroupGender);
+
+                if (ageEditText.getText().toString().trim().isEmpty()
+                        || genderGroup.getCheckedRadioButtonId() == -1) {
+                    Toast.makeText(getBaseContext(), MSG_INVALID_EMERGENCY_DATA, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                strEmergencyAge = ageEditText.getText().toString().trim();
+                RadioButton rb = (RadioButton) findViewById(genderGroup.getCheckedRadioButtonId());
+                strEmergencyGender = rb.getText().toString().equalsIgnoreCase("M") ? "Male" : "Female";
+
                 AsyncCallWS_NewEmergency taskNewEmergency = new AsyncCallWS_NewEmergency();
                 taskNewEmergency.execute();
                 break;
@@ -16404,6 +16483,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                         try {
                             int iTemp1 = Integer.parseInt(strTemp);
                             OnlinePatient.strPatientID = strTemp;
+                        //    Toast.makeText(getBaseContext(), OnlinePatient.strPatientID, Toast.LENGTH_SHORT).show();
                             RegisterPatientResponseReceived = true;
                         } catch (NumberFormatException e) {
                         }
@@ -18649,8 +18729,8 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                 if(rptPatient.strPatient_Fname.substring(0, 9).equalsIgnoreCase("Emergency")) {
 //                    canvas.drawText(String.format("%s%s", PATIENT_NAME, rptPatient.strPatient_Fname), 100, 200, text_paint);
                     canvas.drawText(String.format("%s%s", PATIENT_NAME, rptPatient.strPatient_Fname), 100, 200, text_paint);
-                    canvas.drawText(String.format("%s%s", "Age: ", "-"), 100, 250, text_paint);
-                    canvas.drawText(String.format("%s%s", "Gender: ", "-"), 100, 300, text_paint);
+                    canvas.drawText(String.format("%s%s", "Age: ", rptPatient.PatientAge), 100, 250, text_paint);
+                    canvas.drawText(String.format("%s%s", "Gender: ", rptPatient.strPatient_Gender), 100, 300, text_paint);
                 } else {
 //                    canvas.drawText(String.format("%s%s%s%s%s%s", PATIENT_NAME, rptPatient.strPatient_Fname, " ", rptPatient.PatientAge, "/", rptPatient.strPatient_Gender), 100, 200, text_paint);
                     canvas.drawText(String.format("%s%s", PATIENT_NAME, rptPatient.strPatient_Fname), 100, 200, text_paint);
