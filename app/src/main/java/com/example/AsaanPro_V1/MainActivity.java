@@ -167,7 +167,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 //    public String ASAAN_PRO_VERSION = "1.0";    //15-Jan-2024
     public String ASAAN_PRO_VERSION = "1.0.0";    //14-Apr-2025
-
     public static final long NASAN_I2I_TOKEN_TIMEOUT_MSEC       = (15 * 60 * 1000);
 
     public static final String NASAN_I2I_URL_getonlinestatus    = "/ecgapi/ping";
@@ -435,11 +434,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public static final int SYNC_SERVER_TIMEOUT_MSEC            = 10000;
 
     public static final float GAIN_ONE_FRACTION                 = (float) (1.0 / 5);
-    public static final short GAIN_ONE_Q15                      = (short) (GAIN_ONE_FRACTION * 32768);
+ //   public static final short GAIN_ONE_Q15                      = (short) (GAIN_ONE_FRACTION * 32768);
+    public static final short GAIN_ONE_Q15                      = (short) (GAIN_ONE_FRACTION * 27000);
     public static final float GAIN_HALF_FRACTION                = (float) (GAIN_ONE_FRACTION / 2);
-    public static final short GAIN_HALF_Q15                     = (short) (GAIN_HALF_FRACTION * 32768);
+ //   public static final short GAIN_HALF_Q15                     = (short) (GAIN_HALF_FRACTION * 32768);
+    public static final short GAIN_HALF_Q15                     = (short) (GAIN_HALF_FRACTION * 24000);
     public static final float GAIN_TWO_FRACTION                 = (float) (GAIN_ONE_FRACTION * 2);
-    public static final short GAIN_TWO_Q15                      = (short) (GAIN_TWO_FRACTION * 32768);
+ //   public static final short GAIN_TWO_Q15                      = (short) (GAIN_TWO_FRACTION * 32768);
+    public static final short GAIN_TWO_Q15                      = (short) (GAIN_TWO_FRACTION * 28000);
 
     public static final short RECORD_DURATION_SEC               = 10;
     public static final short SAMPLES_PER_SEC                   = 250;
@@ -9838,7 +9840,8 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             }
 
             Emergency = false;
-
+            GainScale = DefaultGainScale;
+            SpeedScale = DefaultSpeedScale;
 //            if(DemoMode) {
 //                TextView tv = (TextView)findViewById(R.id.textViewDemoMode);
 //                tv.setVisibility(View.VISIBLE);
@@ -12236,7 +12239,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             Button bt = (Button) findViewById(R.id.buttonPrintReportA4);
             bt.setEnabled(PrintBeforeSend);
             bt = (Button) findViewById(R.id.buttonEmailReport);
-            bt.setEnabled(PrintBeforeSend);
+            bt.setEnabled(true);
         } else {
 //            Button bt = (Button) findViewById(R.id.buttonPrintReportThermal);
 //            bt.setEnabled(true);
@@ -13331,7 +13334,7 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             Button bt = (Button) findViewById(R.id.buttonPrintReportA4);
             bt.setEnabled(false);
             bt = (Button) findViewById(R.id.buttonEmailReport);
-            bt.setEnabled(false);
+            bt.setEnabled(true);
             tv = (TextView)findViewById(R.id.textViewTime);
             tv.setVisibility(View.INVISIBLE);
             tv = (TextView)findViewById(R.id.textViewECGTime);
@@ -17897,7 +17900,11 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
                     switch(A4ReportCode) {
                         case A4REPORT_SINGLE_PAGE_ECG_LAYOUT_3_BY_4:
                             drawPageEcg_3By4(page, ReportPatient, selectedScan);
-                        break;
+                            break;
+
+                        default:
+                            drawPageEcg_3By4(page, ReportPatient, selectedScan);
+                            break;
                     }
 
                     // Rendering is complete, so page can be finalized.
@@ -18746,6 +18753,18 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
 
             canvas.drawText(String.format("%s%s", DATE, ecgScan.strScanDate), 100, 350, text_paint);
             canvas.drawText(String.format("%s%s", TIME, ecgScan.strScanTime), 450, 350, text_paint);
+            // ID Number for Review Test -> View Report and A4 Print
+            if (rptPatient.strIDNumber != null
+                    && !rptPatient.strIDNumber.trim().isEmpty()
+                    && !rptPatient.strIDNumber.trim().equalsIgnoreCase("null")) {
+
+                canvas.drawText(
+                        "ID Number: " + rptPatient.strIDNumber.trim(),
+                        730,
+                        350,
+                        text_paint
+                );
+            }
 
             //Measurement
             canvas.drawText(String.format("%s%s%s",
@@ -19672,10 +19691,22 @@ public void SaveECGDataLocally(Boolean ToPrint, Boolean ToRefer) {
             canvas.drawText(String.format("%s%s", DATE, ecgScan.strScanDate), 100, 350, text_paint);
             canvas.drawText(String.format("%s%s", TIME, ecgScan.strScanTime), 430, 350, text_paint);
 //bmp 28-Feb-25
-            if(rptPatient.strIDNumber != null) {
+          /*  if(rptPatient.strIDNumber != null) {
                 if (rptPatient.strIDNumber.length() > 0) {
                     canvas.drawText(String.format("%s%s", "ID Number: ", rptPatient.strIDNumber), 730, 350, text_paint);
                 }
+            }*/
+            // Show ID Number in Review Test -> View Report PDF.
+            if (rptPatient.strIDNumber != null
+                    && !rptPatient.strIDNumber.trim().isEmpty()
+                    && !rptPatient.strIDNumber.equalsIgnoreCase("null")) {
+
+                canvas.drawText(
+                        String.format("%s%s", "ID Number: ", rptPatient.strIDNumber.trim()),
+                        730,
+                        350,
+                        text_paint
+                );
             }
 //bmp 28-Feb-25
 
